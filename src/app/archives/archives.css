@@ -1,0 +1,332 @@
+/* ─── ARCHIVES PAGE — Clean Editorial Grid ─────────────────────── */
+
+.archive-page {
+  background: transparent;
+  min-height: 100vh;
+}
+
+/* ── TITLE BAR ────────────────────────────────────────────────── */
+.archive-title-bar {
+  padding: 8rem 0 4rem;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(8px);
+  text-align: center;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.archive-title-bar h1 {
+  font-size: 3.5rem;
+  font-weight: 950;
+  color: var(--text-main);
+  letter-spacing: -0.05em;
+  margin: 0.5rem 0 1rem;
+  text-transform: uppercase;
+}
+
+.archive-title-bar p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.title-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 4px;
+}
+
+/* ── FILTER TAB PILLS ─────────────────────────────────────────── */
+.archive-filters {
+  padding: 1rem 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0px;
+  z-index: 1000;
+}
+
+.filter-list {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-weight: 800;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #888;
+  position: relative;
+}
+
+.filter-btn:hover {
+  color: var(--text-main);
+  background: #f8f8f8;
+}
+
+.filter-btn.active {
+  color: var(--primary);
+  background: transparent;
+}
+
+.filter-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0.4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+}
+
+/* ── MAGAZINE GRID ────────────────────────────────────────────── */
+.archive-grid-section {
+  padding: 8rem 0;
+}
+
+.archive-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rem;
+}
+
+.mag-card {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  padding: 0;
+  border: none;
+  transition: all 0.4s ease;
+}
+
+.mag-card:hover {
+  border-color: transparent;
+}
+
+.mag-card-cover-container {
+  perspective: 1000px;
+  margin-bottom: 1.5rem;
+}
+
+.cover-interaction-zone {
+  cursor: pointer;
+}
+
+.cover-wrapper {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  aspect-ratio: 1 / 1.414;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+
+.archive-tag {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.mag-card:hover .cover-wrapper {
+  transform: rotateY(-10deg) rotateX(5deg) translateY(-12px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+}
+
+.archive-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.mag-hover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.mag-card:hover .mag-hover-overlay {
+  opacity: 1;
+}
+
+.btn-read-pdf {
+  display: inline-block;
+  padding: 0.8rem 1.8rem;
+  background: white;
+  color: black;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.75rem;
+  border-radius: 40px;
+  text-decoration: none;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+}
+
+.mag-card:hover .btn-read-pdf {
+  transform: translateY(0);
+}
+
+.btn-read-pdf:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.mag-card-info {
+  flex-grow: 1;
+}
+
+.mag-card-info {
+  text-align: center;
+}
+
+.mag-date {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.mag-card-info h3 {
+  font-size: 1.1rem;
+  font-weight: 950;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* ── CALL TO ACTION BOX ───────────────────────────────────────── */
+.archive-cta {
+  padding: 8rem 0;
+  background: #fdfdfd;
+  border-top: 1px solid var(--border-color);
+}
+
+.cta-box {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(15px);
+  padding: 6rem;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.cta-box h2 {
+  font-size: 2.5rem;
+  font-weight: 950;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.cta-box p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 3rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-contact-archives {
+  display: inline-block;
+  padding: 1.5rem 3.5rem;
+  background: #111;
+  color: #fff;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 1rem;
+  border-radius: 50px;
+}
+
+.btn-contact-archives:hover {
+  background: var(--primary);
+}
+
+
+/* ── LOADING STATE ───────────────────────────────────────────── */
+.archive-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10rem 0;
+  color: var(--text-muted);
+}
+
+.loader {
+  width: 48px;
+  height: 48px;
+  border: 3px solid #eee;
+  border-bottom-color: var(--primary);
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+  margin-bottom: 1.5rem;
+}
+
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .archive-grid { grid-template-columns: repeat(2, 1fr); gap: 3rem; }
+}
+
+@media (max-width: 768px) {
+  .archive-title-bar { padding: 4rem 1rem 3rem; }
+  .archive-title-bar h1 { font-size: 2.2rem; }
+  .archive-grid-section { padding: 4rem 1rem; }
+  .archive-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .archive-cta { padding: 4rem 1rem; }
+  .cta-box { padding: 3rem 1.5rem; }
+  .cta-box h2 { font-size: 2rem; }
+  
+  .filter-list {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 0.5rem 1rem;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+  
+  .filter-list::-webkit-scrollbar {
+    display: none; /* Hide scrollbar Chrome/Safari */
+  }
+  
+  .filter-btn {
+    flex-shrink: 0;
+  }
+}

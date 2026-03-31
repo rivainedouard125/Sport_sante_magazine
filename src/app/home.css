@@ -1,0 +1,567 @@
+/* ── HOME LUXURY REFACTOR ─────────────────────────────────────────── */
+
+.home {
+  background: transparent;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── HERO SECTION ────────────────────────────────────────────────── */
+.home-hero-section {
+  padding: 8rem 0 10rem;
+}
+
+.issue-main-highlight {
+  display: flex;
+  align-items: center;
+  gap: 5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Cover Interaction */
+.cover-interaction-zone {
+  flex-shrink: 0;
+  cursor: pointer;
+  perspective: 1000px;
+  overflow: visible !important;
+}
+
+.cover-wrapper {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  overflow: visible !important;
+}
+
+.cover-badge {
+  position: absolute;
+  top: 1.5rem;
+  left: -1rem;
+  transform: rotate(-4deg);
+}
+
+.cover-interaction-zone:hover .cover-wrapper {
+  transform: rotateY(-8deg) rotateX(4deg) translateY(-10px);
+}
+
+.cover-img {
+  width: 420px;
+  height: auto;
+  border-radius: 4px; /* Essential for magazine sharp look */
+  box-shadow: 0 40px 100px rgba(0,0,0,0.15), 
+              0 20px 40px rgba(0,0,0,0.1);
+  display: block;
+}
+
+.view-sommaire-hint {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 0.8rem 1.4rem;
+  border-radius: 40px;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: all 0.4s ease;
+  white-space: nowrap;
+}
+
+.cover-interaction-zone:hover .view-sommaire-hint {
+  opacity: 1;
+  bottom: 3rem;
+}
+
+/* Editorial Content */
+.issue-editorial-content {
+  flex: 1;
+}
+
+.issue-meta-brand {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+}
+
+.main-headline {
+  font-size: clamp(2.5rem, 5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+}
+
+.main-headline span {
+  color: var(--primary);
+  display: block;
+}
+
+.main-body-text {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #4a4a4a;
+  max-width: 540px;
+  margin-bottom: 3rem;
+}
+
+.main-actions {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+
+/* ── LUXURY BUTTONS REMOVED - using globals btn-editorial ───────────────── */
+
+.btn-text-link {
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: #222;
+  padding: 0.5rem 1.2rem;
+  border: 2px solid transparent;
+  border-radius: 40px;
+  background: rgba(0,0,0,0.03);
+  transition: all 0.3s ease;
+}
+
+.btn-text-link:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--primary);
+}
+
+/* ── SOMMAIRE MODAL ────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(253, 250, 246, 0.98); /* Solid var(--bg-page) opacity */
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  animation: fadeIn 0.4s ease;
+}
+
+.modal-content {
+  background: var(--bg-card);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  padding: 4rem;
+  position: relative;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.12);
+  border-radius: 4px;
+  overflow-y: auto;
+  animation: slideUp 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.modal-close {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  font-size: 2.5rem;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.modal-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #1a1a1a;
+}
+
+.modal-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 4rem;
+}
+
+.modal-cover-mini img {
+  width: 100%;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.modal-sommaire-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+}
+
+.modal-sommaire-item {
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.page-num {
+  font-weight: 800;
+  color: var(--primary);
+  min-width: 45px;
+  font-size: 0.9rem;
+}
+
+.page-title {
+  font-weight: 600;
+  color: #333;
+}
+
+/* ── EDITORIAL MODERN ─────────────────────────────────────────── */
+.edito-section-modern {
+  padding: 8rem 0;
+  background: var(--bg-card); 
+  position: relative;
+  margin-top: 4rem;
+  border-top: 2px solid var(--border-color);
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Perfect Edge Alignment */
+.editorial-ribbon.static.top {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.editorial-ribbon.static.bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.edito-grid {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 5rem;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.edito-portrait {
+  height: 460px;
+  background: #eee url('/media/photos/n328-sport-sante-1.jpg') center/cover;
+  border-radius: 4px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+}
+
+.edito-label-alt {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+  margin-bottom: 1.2rem;
+}
+
+.edito-heading-large {
+  font-size: 2.8rem;
+  font-weight: 900;
+  margin-bottom: 1.8rem;
+  letter-spacing: -0.04em;
+  color: #111;
+  line-height: 1.1;
+}
+
+.edito-text-prose p {
+  font-size: 1.15rem;
+  line-height: 1.8;
+  color: #444;
+  margin-bottom: 1.2rem;
+}
+
+.edito-signature {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #111;
+  margin-top: 2.5rem;
+}
+
+.edito-signature span {
+  font-weight: 400;
+  color: #888;
+  margin-left: 0.5rem;
+}
+
+/* ── CTA MODERN ───────────────────────────────────────────────── */
+.cta-modern {
+  padding-bottom: 6rem;
+}
+
+.cta-box {
+  background: #111;
+  padding: 6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 8px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-box::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: var(--primary);
+}
+
+.cta-h2-large {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.cta-p-small {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.6);
+}
+
+/* removed .btn-luxury-white */
+
+/* ── FEATURED NEWS (Dossiers) ─────────────────────────────────── */
+.home-features-section {
+  padding: 8rem 0;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.section-label-left {
+  text-align: left;
+}
+
+.section-headline-bold {
+  font-size: 3.5rem;
+  font-weight: 1000;
+  text-align: center;
+  margin-bottom: 5rem;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+}
+
+.section-headline-left {
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.section-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 4rem;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3rem;
+}
+
+.feature-card {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  transition: all 0.4s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.06);
+  border-color: var(--primary);
+}
+
+.feature-img-wrapper {
+  height: 240px;
+  width: 100%;
+  background: #eee;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.feature-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.feature-card:hover .feature-img-wrapper img {
+  transform: scale(1.1);
+}
+
+/* removed .feature-tag */
+
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1.3;
+  color: #111;
+}
+
+/* ── ARCHIVE PREVIEW ─────────────────────────────────────────── */
+.home-archives-preview {
+  padding: 8rem 0;
+  background: transparent;
+}
+
+.archive-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.archive-mini-card {
+  perspective: 1000px;
+}
+
+.archive-mini-card-inner {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.archive-mini-card:hover .archive-mini-card-inner {
+  transform: rotateY(-15deg) rotateX(10deg);
+}
+
+.archive-mini-img {
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  /* Hero Section */
+  .issue-main-highlight {
+    flex-direction: column;
+    text-align: center;
+    gap: 4rem;
+  }
+  .main-body-text { margin: 0 auto 3rem; }
+  .main-actions { justify-content: center; }
+  .view-sommaire-hint { display: none; } /* Hint can be annoying on touch screens */
+
+  /* Features */
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Editorial */
+  .edito-grid { grid-template-columns: 1fr; }
+  .edito-portrait { height: 350px; }
+
+  /* Archives */
+  .archive-preview-grid { grid-template-columns: repeat(2, 1fr); }
+  
+  /* CTA */
+  .cta-box { flex-direction: column; gap: 3rem; text-align: center; padding: 4rem; }
+}
+
+@media (max-width: 640px) {
+  /* Global Spacing */
+  .home-hero-section { padding: 4rem 1rem; }
+  .home-features-section { padding: 4rem 0; }
+  .edito-section-modern { padding: 4rem 1rem; margin-top: 2rem; }
+  .home-archives-preview { padding: 4rem 1rem; }
+  
+  /* Hero Layout Constraints */
+  .cover-img { width: 100%; max-width: 320px; margin: 0 auto; }
+  .main-headline { font-size: 2.2rem; }
+  .main-body-text { font-size: 1.05rem; }
+  .main-actions { flex-direction: column; gap: 1.5rem; width: 100%; align-items: stretch; }
+  .btn-text-link { text-align: center; width: 100%; display: block; }
+  .cover-badge { left: 0; top: 0rem; }
+  
+  /* Section Header Flex Stacking */
+  .section-header-flex { flex-direction: column; align-items: flex-start; gap: 2rem; margin-bottom: 2rem; margin-top: 1rem;}
+  .section-headline-bold { font-size: 2rem; margin-bottom: 2rem; }
+
+  /* Modal */
+  .modal-content { padding: 2rem; }
+  .modal-grid { grid-template-columns: 1fr; }
+  .modal-cover-mini { display: none; }
+  .modal-title { font-size: 2rem; }
+
+  /* Editorial Components */
+  .edito-heading-large { font-size: 2rem; }
+  .edito-portrait { display: none; }
+
+  /* App-Style Horizontal Drag Grid for Features! */
+  .features-grid { 
+    display: flex; 
+    overflow-x: auto; 
+    scroll-snap-type: x mandatory; 
+    gap: 1.5rem; 
+    padding: 0 1rem 2rem 1rem; 
+    -webkit-overflow-scrolling: touch; 
+    scrollbar-width: none; /* Firefox */
+  }
+  .features-grid::-webkit-scrollbar { display: none; } /* Hide scrollbar for clean App-style look on Chrome/Safari */
+  
+  .feature-card { 
+    min-width: 85vw; /* Almost full width with peek to next card */
+    scroll-snap-align: center; 
+  }
+
+  /* Archives Components */
+  .archive-preview-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+  /* CTA Modern Container Adjustment */
+  .cta-modern { padding-bottom: 3rem; padding-left: 1rem; padding-right: 1rem; }
+  .cta-box { padding: 3rem 1.5rem; }
+  .cta-h2-large { font-size: 1.8rem; }
+  /* removed btn-luxury-white */
+}

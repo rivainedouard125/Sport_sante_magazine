@@ -1,0 +1,260 @@
+:root {
+  --primary: #da121a;
+  --primary-hover: #bd0f16;
+
+  /* Light magazine palette */
+  --bg-page: #fdfaf6;       /* Warm editorial beige, mimics premium paper */
+  --bg-card: #ffffff;       /* Pure white cards */
+  --bg-dark: #1a1a1a;       /* Reserved for footer / dark sections */
+  --bg-darker: #111111;
+
+  --text-main: #1a1a1a;     /* Near-black for body text */
+  --text-muted: #666666;    /* Mid-grey for secondary info */
+  --text-light: #ffffff;    /* White text on dark backgrounds */
+
+  --border-color: #e4e4e4;  /* Soft dividers */
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+  --radius: 2px; /* Sharp, traditional print magazine edge */
+  --transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── BASE STYLES ────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-page); /* Paper background on root */
+}
+
+body {
+  background: transparent; /* Allow background shapes to layer correctly */
+  color: var(--text-main);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── PAPER TEXTURE OVERLAY ─────────────────────────────────────── */
+.paper-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.045; /* Extremely subtle film grain */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ─── EDITORIAL TYPOGRAPHY ───────────────────────────────────────── */
+.font-serif {
+  font-family: var(--font-playfair), serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, .heading-editorial {
+  font-family: var(--font-playfair), serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* ─── LAYOUT ──────────────────────────────────────────────────────── */
+.container {
+  max-width: 1160px; /* Slightly wider for modern layout */
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ─── REVEAL ANIMATIONS ─────────────────────────────────────────── */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── TYPOGRAPHY UTILITIES ────────────────────────────────────────── */
+.text-primary { color: var(--primary); }
+.bg-primary   { background-color: var(--primary); }
+
+.section-title {
+  font-family: var(--font-playfair), serif;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--text-main);
+  padding-bottom: 0.6rem;
+  border-bottom: 3px solid var(--primary);
+  display: inline-block;
+  margin-bottom: 2.5rem;
+  letter-spacing: -0.04em;
+  position: relative;
+  z-index: 10;
+}
+
+/* ─── CARD ────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-4px);
+  border-color: #d1d1d1;
+}
+
+/* ─── PREMIUM EDITORIAL BUTTONS ───────────────────────────────────── */
+.btn-editorial-dark, .btn-editorial-red, .btn-editorial-white {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 2.8rem;
+  border-radius: 50px; /* Modern Rounded Pill */
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-editorial-dark {
+  background: var(--bg-darker);
+  color: #fff;
+}
+.btn-editorial-dark:hover {
+  background: #c5141c;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(218, 18, 26, 0.25);
+}
+
+.btn-editorial-red {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-editorial-red:hover {
+  background: #c5141c;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(218, 18, 26, 0.35);
+}
+
+.btn-editorial-white {
+  background: #fff;
+  color: var(--text-main);
+}
+.btn-editorial-white:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(218, 18, 26, 0.25);
+}
+
+.btn-text-link {
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--text-main);
+  padding: 0.6rem 1.4rem;
+  border-radius: 40px;
+  background: rgba(0,0,0,0.03);
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+}
+.btn-text-link:hover {
+  background: rgba(0,0,0,0.06);
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+/* ─── EDITORIAL BACKGROUND LAYER (Fixed & Sleek) ──────────────── */
+.editorial-bg-layer {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1; 
+  overflow: hidden;
+  background-color: var(--bg-page);
+
+  /* THE POLKA DOT LAYER (Minimalist Magazine Style) */
+  background-image: radial-gradient(var(--primary) 1.5px, transparent 0);
+  background-size: 50px 50px;
+  background-position: center center;
+  opacity: 0.08; /* Much more subtle now that red blobs are gone */
+}
+
+/* ─── PAGE HEADER UTILITY ───────────────────────────────────────── */
+.page-header {
+  padding: 4rem 1rem 3rem;
+  background: var(--bg-card); /* Stark crisp white */
+  text-align: center;
+  border-bottom: 2px solid var(--border-color); /* Strict crisp line */
+  margin-bottom: 4rem; /* Built-in spacing for consistent flow */
+}
+
+.page-header h1 {
+  font-size: 3.5rem;
+  font-weight: 950;
+  color: var(--text-main);
+  letter-spacing: -0.05em;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+@media (max-width: 700px) {
+  .page-header {
+    padding: 3rem 1rem 2rem;
+    margin-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-size: 2.22rem;
+  }
+}
+
+/* ─── EDITORIAL TAGS (Unified Style) ─────────────────────────────── */
+.editorial-tag {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 950;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.4rem 1.1rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.editorial-tag.red {
+  background: var(--primary);
+  border-color: rgba(218, 18, 26, 0.4);
+}

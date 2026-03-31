@@ -1,0 +1,205 @@
+/* ─── KIOSKS PAGE — Editorial Design ────────────────────────────── */
+
+.kiosks-page {
+  background-color: var(--bg-page);
+  min-height: 100vh;
+}
+
+/* ── HERO / PRICE ─────────────────────────────────────────────── */
+.kiosks-hero {
+  position: relative;
+  padding: 8rem 0;
+  background: var(--bg-darker);
+  overflow: hidden;
+  text-align: center;
+}
+
+.kiosks-hero-bg {
+  position: absolute;
+  inset: 0;
+  background-image: url('/media/photos/bike-race.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%) brightness(0.4);
+  z-index: 1;
+}
+
+.kiosks-hero-content {
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.price-tag {
+  font-size: 5rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 30px rgba(218, 18, 26, 0.4);
+}
+
+.price-label {
+  font-size: 1.2rem;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  display: block;
+}
+
+.hero-description {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── LOCATIONS ────────────────────────────────────────────────── */
+.locations-section {
+  padding: 8rem 0;
+}
+
+.locations-split {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 5rem;
+  align-items: flex-start;
+}
+
+.locations-sidebar .sec-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.04em;
+}
+
+.locations-sidebar .sec-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.locations-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+}
+
+.location-item {
+  border-top: 2px solid var(--primary);
+  padding-top: 1.5rem;
+}
+
+.location-item h3 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.location-item h3::before {
+  content: '📍';
+  font-size: 0.9rem;
+}
+
+.location-item ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.location-item li {
+  font-size: 1rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.location-item li:last-child {
+  border-bottom: none;
+}
+
+.location-item li strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+/* ── CONTACT BANNER ───────────────────────────────────────────── */
+.contact-banner {
+  background: white;
+  padding: 6rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.contact-box {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 4rem;
+  border: 4px solid var(--primary);
+  border-radius: var(--radius);
+  position: relative;
+  background: var(--bg-card);
+}
+
+.contact-box h2 {
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+
+.contact-box p {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.phone-link {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--primary);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.address-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ── RESPONSIVE ────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .locations-split {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .locations-sidebar {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .kiosks-hero { padding: 4rem 1rem; }
+  .price-tag { font-size: 3rem; }
+  .locations-section { padding: 4rem 1rem; }
+  .locations-grid { grid-template-columns: 1fr; gap: 2rem; }
+  .contact-banner { padding: 4rem 1rem; }
+  .contact-box { padding: 2rem 1.5rem; }
+  .phone-link { font-size: 1.6rem; }
+}
