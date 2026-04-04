@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb',  // Allow large PDF + image uploads
+    },
+  },
 };
 
 export default nextConfig;

@@ -1,0 +1,101 @@
+.sidebar-ads-container {
+  padding-top: 8rem; /* Aligns with the padding of home sections */
+}
+
+.sidebar-ads-sticky {
+  position: sticky;
+  top: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.sidebar-ads-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #999;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+.sidebar-ads-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.sidebar-ad-card {
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.sidebar-ad-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+  border-color: var(--primary);
+}
+
+.sidebar-ad-img {
+  max-width: 100%;
+  height: auto;
+  max-height: 120px;
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transition: all 0.4s ease;
+}
+
+.sidebar-ad-card:hover .sidebar-ad-img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-ads-container {
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-color);
+  }
+  .sidebar-ads-sticky {
+    position: static; /* Don't stick on tablet/mobile */
+  }
+  .sidebar-ads-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+  }
+  .sidebar-ad-card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar-ads-container {
+    padding: 2rem 1rem;
+    border-top: 2px solid var(--border-color);
+  }
+  .sidebar-ads-sticky {
+    position: static;
+  }
+  .sidebar-ads-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  .sidebar-ad-card {
+    padding: 0.75rem;
+  }
+  .sidebar-ad-img {
+    max-height: 80px;
+    /* Show in colour on mobile — no hover available */
+    filter: grayscale(0%);
+    opacity: 1;
+  }
+}

@@ -26,8 +26,8 @@ export async function GET() {
         const id = idMatch ? parseInt(idMatch[1], 10) : pdf;
         const title = `Sport Santé N°${id}`;
         
-        // Construct paths for the frontend
-        const src = `/media/covers/archives/${year}/${pdf.replace(/\.pdf$/i, '.jpg')}`;
+        // src points to the PDF — frontend renders page 1 via PDF.js, no static cover needed
+        const src = `/media/archives/${year}/${pdf}`;
         const pdfUrl = `/media/archives/${year}/${pdf}`;
 
         archives.push({

@@ -1,0 +1,490 @@
+/* ── ADMIN DASHBOARD ─────────────────────────────────────────────── */
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: #0d0d0d;
+  padding: 0;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────────────── */
+.admin-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 3rem;
+  background: #111;
+  border-bottom: 1px solid #222;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-brand-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px rgba(218, 18, 26, 0.6);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.admin-brand-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-brand-name span {
+  color: var(--primary);
+}
+
+.admin-user-info {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.admin-welcome {
+  font-size: 0.85rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.admin-logout-btn {
+  padding: 0.6rem 1.4rem;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-logout-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ── TAB NAV ─────────────────────────────────────────────────────── */
+.admin-tab-nav {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0 3rem;
+  background: #111;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.admin-tab-btn {
+  padding: 1.1rem 2rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #555;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.admin-tab-btn:hover {
+  color: #ccc;
+}
+
+.admin-tab-btn.active {
+  color: #fff;
+  border-bottom-color: var(--primary);
+}
+
+.admin-tab-icon {
+  font-size: 1rem;
+}
+
+/* ── CONTENT AREA ────────────────────────────────────────────────── */
+.admin-content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 2rem 5rem;
+}
+
+.admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ── PANEL HEADER ────────────────────────────────────────────────── */
+.admin-panel-header {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.admin-panel-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.03em;
+}
+
+.admin-panel-desc {
+  font-size: 0.9rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* ── FORM CARD ───────────────────────────────────────────────────── */
+.admin-form-card {
+  background: #111;
+  border: 1px solid #1e1e1e;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.admin-form-card-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-form-card-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #1e1e1e;
+  margin-left: 0.75rem;
+}
+
+/* ── FORM ELEMENTS ───────────────────────────────────────────────── */
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.admin-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.admin-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #555;
+}
+
+.admin-input,
+.admin-textarea {
+  padding: 0.85rem 1rem;
+  background: #0d0d0d;
+  color: #e0e0e0;
+  border: 1px solid #222;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-input:focus,
+.admin-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+  color: #333;
+}
+
+.admin-textarea {
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ── FILE DROP ZONE ──────────────────────────────────────────────── */
+.admin-file-zone {
+  border: 2px dashed #222;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.admin-file-zone:hover {
+  border-color: #444;
+  background: #131313;
+}
+
+.admin-file-zone.has-file {
+  border-color: #2a4a2a;
+  background: #0d1a0d;
+}
+
+.admin-file-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.admin-file-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.admin-file-label { font-size: 0.85rem; color: #555; }
+.admin-file-label strong { color: #888; }
+.admin-file-name {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: #4ade80;
+  font-weight: 600;
+}
+
+/* ── SOMMAIRE EDITOR ─────────────────────────────────────────────── */
+.sommaire-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sommaire-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 32px;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.sommaire-remove-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #222;
+  background: transparent;
+  color: #444;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sommaire-remove-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sommaire-add-btn {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px dashed #333;
+  border-radius: 6px;
+  color: #555;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sommaire-add-btn:hover {
+  border-color: #555;
+  color: #888;
+}
+
+/* ── SUBMIT BUTTON ───────────────────────────────────────────────── */
+.admin-submit-btn {
+  padding: 1rem 2rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.admin-submit-btn:hover:not(:disabled) {
+  background: #c5141c;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(218, 18, 26, 0.3);
+}
+
+.admin-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── STATUS MESSAGES ─────────────────────────────────────────────── */
+.admin-status {
+  padding: 0.9rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-status.success {
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.admin-status.error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* ── HINT BOX ────────────────────────────────────────────────────── */
+.admin-hint {
+  padding: 1rem 1.25rem;
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-left: 3px solid #333;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* ── DRAG-OVER STATE ─────────────────────────────────────────────── */
+.admin-file-zone.dragging {
+  border-color: var(--primary);
+  background: rgba(218, 18, 26, 0.04);
+}
+
+/* ── ARCHIVE AUDIT TABLE ─────────────────────────────────────────── */
+.admin-archive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin-archive-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: #444;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.admin-archive-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #161616;
+  color: #666;
+  vertical-align: middle;
+}
+
+.admin-archive-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-archive-table tr:hover td {
+  background: #131313;
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  background: rgba(218, 18, 26, 0.12);
+  border: 1px solid rgba(218, 18, 26, 0.2);
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.admin-table-link {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #444;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.admin-table-link:hover { color: #fff; }
+
+/* ── PHOTO PREVIEW GRID ──────────────────────────────────────────── */
+.admin-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.admin-photo-thumb {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #222;
+  background: #0d0d0d;
+}
+
+.admin-photo-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── SHIMMER (PDF loading skeleton) ─────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

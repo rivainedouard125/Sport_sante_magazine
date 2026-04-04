@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import PdfCoverThumb from '@/components/PdfCoverThumb';
 import './archives.css';
 
 export default function ArchivesPage() {
@@ -74,7 +75,12 @@ export default function ArchivesPage() {
                     <div className="cover-interaction-zone">
                       <div className="cover-wrapper">
                         <div className="archive-tag editorial-tag red">N°{mag.id}</div>
-                        <img src={mag.src} alt={mag.title} className="archive-cover-img" />
+                        <PdfCoverThumb
+                          pdfUrl={mag.src}
+                          alt={mag.title}
+                          className="archive-cover-img"
+                          style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '2px' }}
+                        />
                         <div className="mag-hover-overlay">
                           <a href={mag.pdfUrl} target="_blank" rel="noopener noreferrer" className="btn-read-pdf">
                             Lire le PDF ↗

@@ -1,45 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './photos.css';
 
 export default function PhotosPage() {
   const [selectedImg, setSelectedImg] = useState(null);
+  const [issues, setIssues] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const issues = [
-    {
-      number: '329',
-      title: 'Edition Printemps 2024',
-      photos: [
-        { src: '/media/photos/n329-salon-des-sports-31.jpg', label: 'Salon des Sports Aix' },
-        { src: '/media/photos/n329-aix-s-elance1.jpg', label: "Aix s'élance" },
-        { src: '/media/photos/n329-enduranne-13.jpg', label: 'E-Running Enduranne' },
-        { src: '/media/photos/n329-salon-des-sports-38.jpg', label: 'Démonstration Aïkido' },
-        { src: '/media/photos/n329-aix-s-elance4.jpg', label: 'Course de Ligue' },
-        { src: '/media/photos/n329-salon-des-sports-3.jpg', label: 'Village des Associations' },
-      ]
-    },
-    {
-      number: '328',
-      title: 'Edition Hiver 2023',
-      photos: [
-        { src: '/media/photos/n328-sport-sante-16.jpg', label: 'Grand Prix Cycliste' },
-        { src: '/media/photos/n328-sport-sante-2.jpg', label: 'Handball Pro - PAUC' },
-        { src: '/media/photos/n328-sport-sante-17.jpg', label: 'Escrime - Tournoi Sabatier' },
-        { src: '/media/photos/n328-sport-sante-1.jpg', label: 'Natation - Meeting Aix' },
-        { src: '/media/photos/n328-sport-sante-18.jpg', label: 'Rugby - Stade Maurice David' },
-        { src: '/media/photos/n328-sport-sante-3.jpg', label: 'Escrime - Podium' },
-      ]
-    }
-  ];
+  useEffect(() => {
+    fetch('/api/photos')
+      .then(r => r.json())
+      .then(data => {
+        setIssues(Array.isArray(data) ? data : []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
-  const openLightbox = (img) => setSelectedImg(img);
-  const closeLightbox = () => setSelectedImg(null);
+  const openLightbox  = img => setSelectedImg(img);
+  const closeLightbox = ()  => setSelectedImg(null);
 
   return (
     <main className="photos-page">
-      
-      {/* ── PAGE HEADER ────────────────────────────────────────────── */}
+
+      {/* ── PAGE HEADER ──────────────────────────────────────────────── */}
       <section className="page-header">
         <div className="container">
           <span className="editorial-tag red" style={{ marginBottom: '1rem' }}>Archives Publiques</span>
@@ -47,33 +32,33 @@ export default function PhotosPage() {
         </div>
       </section>
 
-      {/* ── HERO: SERVICES ─────────────────────────────────────────── */}
+      {/* ── HERO: SERVICES ───────────────────────────────────────────── */}
       <section className="photos-hero">
         <div className="photos-hero-bg"></div>
         <div className="container photos-hero-content">
           <div className="services-grid">
-            
+
             <div className="service-card subscriber">
-              <span className="editorial-tag red">Privilège</span>
+              <span className="editorial-tag">Privilège</span>
               <h2>Acquérir une photo numérique en Haute Définition</h2>
               <p>
-                Abonnés de Sport-Santé ? Nous vous offrons le fichier numérique 
+                Abonnés de Sport-Santé ? Nous vous offrons le fichier numérique
                 haute résolution sur simple demande par e-mail.
               </p>
               <a href="mailto:contact@sport-sante-magazine.fr?subject=Demande Photo Numérique" className="btn-editorial-dark">Demander un fichier</a>
             </div>
 
             <div className="service-card print">
-              <span className="editorial-tag red">Boutique</span>
+              <span className="editorial-tag">Boutique</span>
               <h2>Acheter un tirage papier de qualité professionnelle</h2>
               <p>
-                Gardez un souvenir impérissable de vos exploits avec des tirages papier 
+                Gardez un souvenir impérissable de vos exploits avec des tirages papier
                 professionnels disponibles sur notre boutique Jingoo.
               </p>
-              <a 
-                href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn-editorial-white"
               >
                 Accéder aux Galeries ↗
@@ -84,33 +69,58 @@ export default function PhotosPage() {
         </div>
       </section>
 
-      {/* ── GALLERY BY ISSUES ──────────────────────────────────────── */}
+      {/* ── GALLERY BY ISSUES ────────────────────────────────────────── */}
       <section className="photos-by-issue">
         <div className="container">
-          
-          {issues.map((issue) => (
-            <div key={issue.number} className="issue-segment">
-              
+
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: '#999' }}>
+              Chargement de la photothèque…
+            </div>
+          )}
+
+          {!loading && issues.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: '#999' }}>
+              Aucune photo disponible pour le moment.
+            </div>
+          )}
+
+          {issues.map((group) => (
+            <div key={group.edition} className="issue-segment">
+
               <header className="issue-header">
                 <div className="issue-label">
-                  <span className="num-watermark">{issue.number}</span>
+                  {group.edition !== 'general' && (
+                    <span className="num-watermark">{group.edition}</span>
+                  )}
                   <div className="issue-meta">
-                    <span className="editorial-tag red">Sport-Santé N°{issue.number}</span>
-                    <h2 className="issue-mag-title">{issue.title}</h2>
+                    <span className="editorial-tag red">
+                      {group.edition === 'general' ? 'Galerie Générale' : `Sport-Santé N°${group.edition}`}
+                    </span>
+                    <h2 className="issue-mag-title">
+                      {group.edition === 'general'
+                        ? `${group.photos.length} photo(s)`
+                        : `${group.photos.length} photo(s) — Édition N°${group.edition}`}
+                    </h2>
                   </div>
                 </div>
                 <div className="issue-actions">
-                   <a href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401" className="btn-editorial-dark">
-                     Voir toute la série
-                   </a>
+                  <a
+                    href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401"
+                    className="btn-editorial-dark"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Voir toute la série
+                  </a>
                 </div>
               </header>
 
               <div className="issue-grid">
-                {issue.photos.map((photo, pIdx) => (
+                {group.photos.map((photo, pIdx) => (
                   <div key={pIdx} className="modern-photo-card" onClick={() => openLightbox(photo)}>
                     <div className="photo-inner">
-                      <img src={photo.src} alt={photo.label} />
+                      <img src={photo.src} alt={photo.label} loading="lazy" />
                       <div className="photo-hover-pane">
                         <span className="photo-event-label">{photo.label}</span>
                         <div className="photo-cta">Agrandir</div>
@@ -126,15 +136,15 @@ export default function PhotosPage() {
         </div>
       </section>
 
-      {/* ── FOOTER CTA ──────────────────────────────────────────────── */}
+      {/* ── FOOTER CTA ───────────────────────────────────────────────── */}
       <section className="gallery-footer-final">
         <div className="container">
           <h3>Retrouvez l'intégralité de nos archives</h3>
           <p>Plus de 50 ans de sport aixois à portée de clic.</p>
-          <a 
-            href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401" 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href="https://www.jingoo.com/album/postershop/index.php?id_photographe=143401"
+            target="_blank"
+            rel="noopener noreferrer"
             className="btn-editorial-dark"
           >
             Explorer les 10,000+ photos sur Jingoo
@@ -142,10 +152,10 @@ export default function PhotosPage() {
         </div>
       </section>
 
-      {/* ── LIGHTBOX PORTAL ────────────────────────────────────────── */}
+      {/* ── LIGHTBOX ─────────────────────────────────────────────────── */}
       {selectedImg && (
         <div className="lightbox-overlay" onClick={closeLightbox}>
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+          <div className="lightbox-content" onClick={e => e.stopPropagation()}>
             <button className="lightbox-close" onClick={closeLightbox}>&times;</button>
             <div className="lightbox-img-box">
               <img src={selectedImg.src} alt={selectedImg.label} />

@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import './home.css';
+import SidebarAds from '@/components/SidebarAds';
+import PdfCoverThumb from '@/components/PdfCoverThumb';
 
 const sommaire = [
   ['4',  'Kilian et Alexis, fierté du PAN'],
@@ -92,36 +94,38 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── MAIN CONTENT & SIDEBAR GRID ───────────────────────────── */}
+      <div className="home-grid-layout container">
+        <div className="home-main-column">
+
       {/* ── FEATURED NEWS (Dossiers) ─────────────────────────────────── */}
       <section className="home-features-section">
-        <div className="container">
-          <span className="section-label reveal-on-scroll">À la une</span>
-          <h2 className="section-headline-bold reveal-on-scroll">Les Dossiers de la Rédaction</h2>
-          
-          <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/bike-race.jpg" alt="Cyclisme" />
-              </div>
-              <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Cyclisme</span>
-              <h3 className="feature-title">Le Peloton Aixois : Une passion qui ne faiblit pas</h3>
-            </div>
-            
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/n329-salon-des-sports-3.jpg" alt="Salon des Sports" />
-              </div>
-              <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Événement</span>
-              <h3 className="feature-title">Salon des Sports : Le rendez-vous de la rentrée</h3>
-            </div>
+        <span className="section-label reveal-on-scroll features-label">À la une</span>
+        <h2 className="section-headline-bold reveal-on-scroll features-headline">Les Dossiers de la Rédaction</h2>
 
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/n329-aix-s-elance1.jpg" alt="Trail Urbain" style={{ objectPosition: 'top' }} />
-              </div>
-              <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Athlétisme</span>
-              <h3 className="feature-title">Aix s'élance : Le trail urbain séduit toujours plus</h3>
+        <div className="features-grid">
+          <div className="feature-card reveal-on-scroll" style={{transitionDelay: '0.1s'}}>
+            <div className="feature-img-wrapper">
+              <img src="/media/photos/bike-race.jpg" alt="Cyclisme" />
             </div>
+            <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Cyclisme</span>
+            <h3 className="feature-title">Le Peloton Aixois : Une passion qui ne faiblit pas</h3>
+          </div>
+
+          <div className="feature-card reveal-on-scroll" style={{transitionDelay: '0.2s'}}>
+            <div className="feature-img-wrapper">
+              <img src="/media/photos/n329-salon-des-sports-3.jpg" alt="Salon des Sports" />
+            </div>
+            <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Événement</span>
+            <h3 className="feature-title">Salon des Sports : Le rendez-vous de la rentrée</h3>
+          </div>
+
+          <div className="feature-card reveal-on-scroll" style={{transitionDelay: '0.3s'}}>
+            <div className="feature-img-wrapper">
+              <img src="/media/photos/n329-aix-s-elance1.jpg" alt="Trail Urbain" style={{ objectPosition: 'top' }} />
+            </div>
+            <span className="editorial-tag red" style={{marginBottom: '1rem'}}>Athlétisme</span>
+            <h3 className="feature-title">Aix s'élance : Le trail urbain séduit toujours plus</h3>
           </div>
         </div>
       </section>
@@ -176,9 +180,16 @@ export default function Home() {
         </div>
 
       </section>
+        </div>{/* End Main Column */}
+        
+        <div className="home-sidebar-column">
+          <SidebarAds />
+        </div>
+      </div>{/* End Grid Layout */}
+
       {/* ── ARCHIVE PREVIEW ─────────────────────────────────────────── */}
       <section className="home-archives-preview">
-        <div className="container">
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 2rem' }}>
           <div className="section-header-flex">
             <div>
               <span className="section-label reveal-on-scroll section-label-left">Collection</span>
@@ -189,14 +200,15 @@ export default function Home() {
 
           <div className="archive-preview-grid">
             {isClient && recentArchives?.length > 0 ? recentArchives.map((file, i) => (
-              <div key={file.id || i} className="archive-mini-card">
+              <div key={file.id || i} className="archive-mini-card" style={{animation: `fadeIn 0.8s ease forwards ${i * 0.15}s`, opacity: 0}}>
                 <Link href={file.pdfUrl} target="_blank">
                   <div className="archive-mini-card-inner">
                     <div className="archive-mini-badge editorial-tag red">N°{file.id}</div>
-                    <img 
-                      src={file.src} 
-                      alt={file.title} 
+                    <PdfCoverThumb
+                      pdfUrl={file.src}
+                      alt={file.title}
                       className="archive-mini-img"
+                      style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px', boxShadow: '0 15px 30px rgba(0,0,0,0.1)' }}
                     />
                   </div>
                 </Link>
@@ -214,7 +226,7 @@ export default function Home() {
       {/* ── CTA BAND ──────────────────────────────────────────────── */}
       <section className="cta-modern">
         <div className="container">
-          <div className="cta-box">
+          <div className="cta-box reveal-on-scroll">
             <div className="cta-text">
               <h2 className="cta-h2-large">Ne manquez plus aucun numéro.</h2>
               <p className="cta-p-small">Recevez Sport Santé directement dans votre boîte aux lettres.</p>
