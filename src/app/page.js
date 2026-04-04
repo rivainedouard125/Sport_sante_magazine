@@ -3,15 +3,22 @@ import HomeContent from './HomeContent';
 
 async function getHomePageData() {
   try {
-    const currentIssue = await prisma.issue.findFirst({
-      where: { isCurrent: true },
-      orderBy: { updatedAt: 'desc' },
-    });
+    const [currentIssue, recentArchives] = await Promise.all([
+      prisma.issue.findFirst({
+        where: { isCurrent: true },
+        orderBy: { updatedAt: 'desc' },
+      }),
+      prisma.archive.findMany({
+        take: 4,
+        orderBy: { issueNumber: 'desc' },
+      })
+    ]);
 
     if (currentIssue) {
       return {
         ...currentIssue,
         sommaire: JSON.parse(currentIssue.sommaireJson || '[]'),
+        recentArchives: recentArchives,
       };
     }
   } catch (err) {

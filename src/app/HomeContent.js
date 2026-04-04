@@ -104,7 +104,7 @@ export default function HomeContent({ data }) {
                 <p>Chaque numéro est une invitation à repousser vos limites, que vous soyez athlète confirmé ou amateur passionné.</p>
               </div>
               <div className="edito-signature">
-                Édouard Rivain <span>Directeur de la Rédaction</span>
+                La Rédaction <span>Comité Éditorial</span>
               </div>
             </div>
           </div>
@@ -123,26 +123,18 @@ export default function HomeContent({ data }) {
           </div>
 
           <div className="archive-preview-grid">
-            <div className="archive-mini-card">
-               <div className="archive-mini-card-inner">
-                  <PdfCoverThumb pdfUrl="/media/archives/2026/SportSante_364.pdf" className="archive-mini-img" />
-               </div>
-            </div>
-            <div className="archive-mini-card">
-               <div className="archive-mini-card-inner">
-                  <PdfCoverThumb pdfUrl="/media/archives/2025/SportSante_360.pdf" className="archive-mini-img" />
-               </div>
-            </div>
-            <div className="archive-mini-card">
-               <div className="archive-mini-card-inner">
-                  <PdfCoverThumb pdfUrl="/media/archives/2024/SportSante_329.pdf" className="archive-mini-img" />
-               </div>
-            </div>
-            <div className="archive-mini-card">
-               <div className="archive-mini-card-inner">
-                  <PdfCoverThumb pdfUrl="/media/archives/2023/SportSante_328.pdf" className="archive-mini-img" />
-               </div>
-            </div>
+            {data.recentArchives && data.recentArchives.length > 0 ? (
+              data.recentArchives.map((mag, idx) => (
+                <div key={idx} className="archive-mini-card">
+                  <div className="archive-mini-card-inner">
+                    <PdfCoverThumb pdfUrl={mag.pdfUrl} className="archive-mini-img" />
+                    <span className="archive-mini-label">N°{mag.issueNumber}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="archive-mini-placeholder">Plus d'archives à venir...</div>
+            )}
           </div>
         </div>
       </section>

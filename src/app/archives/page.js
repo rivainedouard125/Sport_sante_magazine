@@ -20,7 +20,7 @@ export default function ArchivesPage() {
         setLoading(false);
       } catch (err) {
         console.error('Failed to load archives:', err);
-        setError("La photothèque n'est pas encore connectée au Cloud Vercel. Veuillez vérifier votre onglet Storage.");
+        setError("Les archives ne sont pas encore connectées au Cloud Vercel. Veuillez vérifier votre onglet Storage.");
         setLoading(false);
       }
     }
