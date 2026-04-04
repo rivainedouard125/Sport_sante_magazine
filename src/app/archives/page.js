@@ -8,23 +8,28 @@ export default function ArchivesPage() {
   const [archives, setArchives] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeYear, setActiveYear] = useState('Tous');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function loadArchives() {
       try {
         const res = await fetch('/api/archives');
+        if (!res.ok) throw new Error('Erreur de connection au Cloud');
         const data = await res.json();
-        setArchives(data);
+        setArchives(Array.isArray(data) ? data : []);
         setLoading(false);
-      } catch (error) {
-        console.error('Failed to load archives:', error);
+      } catch (err) {
+        console.error('Failed to load archives:', err);
+        setError("La photothèque n'est pas encore connectée au Cloud Vercel. Veuillez vérifier votre onglet Storage.");
         setLoading(false);
       }
     }
     loadArchives();
   }, []);
 
-  const yearsInArchives = ['Tous', ...new Set(archives.map(a => a.year))].sort((a, b) => b - a);
+  const yearsInArchives = archives.length > 0 
+    ? ['Tous', ...new Set(archives.map(a => a.year))].sort((a, b) => b - a)
+    : ['Tous'];
 
   const filteredArchives = activeYear === 'Tous' 
     ? archives 
@@ -62,12 +67,28 @@ export default function ArchivesPage() {
       {/* ── GRID ─────────────────────────────────────────────── */}
       <section className="archive-grid-section">
         <div className="container">
-          {loading ? (
+          {loading && (
             <div className="archive-loading">
               <div className="loader"></div>
               <p>Chargement des archives...</p>
             </div>
-          ) : (
+          )}
+
+          {!loading && error && (
+            <div style={{ textAlign: 'center', padding: '4rem 1rem', color: '#666', background: 'rgba(0,0,0,0.03)', borderRadius: '8px' }}>
+              <p style={{ marginBottom: '1rem' }}>{error}</p>
+              <p style={{ fontSize: '0.85rem' }}>Une fois le <strong>Storage (Blob + Postgres)</strong> connecté dans Vercel, les archives s'afficheront ici.</p>
+            </div>
+          )}
+
+          {!loading && !error && archives.length === 0 && (
+            <div style={{ textAlign: 'center', padding: '10rem 1rem', color: '#999' }}>
+              <h3>Aucune archive disponible</h3>
+              <p>Utilisez l'espace Admin pour uploader votre premier magazine.</p>
+            </div>
+          )}
+
+          {!loading && !error && archives.length > 0 && (
             <div className="archive-grid">
               {filteredArchives.map((mag) => (
                 <article key={mag.id} className="mag-card">
