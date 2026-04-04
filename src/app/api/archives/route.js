@@ -1,44 +1,35 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { list } from '@vercel/blob';
 
 export async function GET() {
-  const archivesDir = path.join(process.cwd(), 'public/media/archives');
-  const coversDir = path.join(process.cwd(), 'public/media/covers/archives');
-
   try {
-    if (!fs.existsSync(archivesDir)) {
-      return NextResponse.json([]);
-    }
-
-    const years = fs.readdirSync(archivesDir).filter(f => 
-      fs.statSync(path.join(archivesDir, f)).isDirectory()
-    );
+    // 1. List all files from Vercel Blob that represent our archives
+    const { blobs } = await list({
+      prefix: 'media/archives/', // Fetch from our cloud folder
+    });
 
     const archives = [];
 
-    years.forEach(year => {
-      const yearDir = path.join(archivesDir, year);
-      const pdfs = fs.readdirSync(yearDir).filter(f => f.toLowerCase().endsWith('.pdf'));
+    blobs.forEach(blob => {
+      const filename = blob.pathname.split('/').pop();
+      if (!filename.toLowerCase().endsWith('.pdf')) return;
 
-      pdfs.forEach(pdf => {
-        const idMatch = pdf.match(/_(\d+)\.pdf$/i);
-        const id = idMatch ? parseInt(idMatch[1], 10) : pdf;
-        const title = `Sport Santé N°${id}`;
-        
-        // src points to the PDF — frontend renders page 1 via PDF.js, no static cover needed
-        const src = `/media/archives/${year}/${pdf}`;
-        const pdfUrl = `/media/archives/${year}/${pdf}`;
+      // Extract Year and Issue Number from the cloud path: media/archives/[YEAR]/SportSante_[NUMBER].pdf
+      const pathParts = blob.pathname.split('/');
+      const year = pathParts[2]; // media(0) / archives(1) / [YEAR](2)
 
-        archives.push({
-          id,
-          title,
-          year,
-          date: `Année ${year}`, // Placeholder date
-          dossier: 'À découvrir dans ce numéro', // Placeholder dossier
-          src,
-          pdfUrl
-        });
+      const idMatch = filename.match(/_(\d+)\.pdf$/i);
+      const id = idMatch ? parseInt(idMatch[1], 10) : filename;
+      const title = `Sport Santé N°${id}`;
+
+      archives.push({
+        id,
+        title,
+        year: year || 'N/A',
+        date: `Année ${year}`,
+        dossier: 'À découvrir dans ce numéro',
+        src: blob.url,       // Points directly to the cloud URL
+        pdfUrl: blob.url,
       });
     });
 
@@ -46,8 +37,8 @@ export async function GET() {
     archives.sort((a, b) => b.id - a.id);
 
     return NextResponse.json(archives);
-  } catch (error) {
-    console.error('Error fetching archives:', error);
-    return NextResponse.json({ error: 'Failed to fetch archives' }, { status: 500 });
+  } catch (err) {
+    console.error('Error fetching Cloud archives:', err);
+    return NextResponse.json({ error: 'Failed to fetch cloud archives' }, { status: 500 });
   }
 }

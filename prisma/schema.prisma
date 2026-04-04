@@ -1,13 +1,38 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// This is your Prisma schema file for Vercel Postgres
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL") // Set by Vercel when you click "Connect Database"
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+// ── MODEL: MAGAZINE ISSUE ───────────────────────────────────────────
+// This model stores the metadata for a magazine issue (headline, sommaire, etc.)
+model Issue {
+  id           Int      @id @default(autoincrement())
+  issueNumber  String   @unique
+  issueDate    String?
+  headline     String?
+  subheadline  String?
+  bodyText     String?
+  coverSrc     String?  // The Cloud URL (Vercel Blob)
+  sommaireJson String?  // Stringified JSON for the table of contents
+  isCurrent    Boolean  @default(false)
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+}
+
+// ── MODEL: ARCHIVE ──────────────────────────────────────────────────
+// Keeps a record of PDFs in the database for faster querying than listing the Cloud files
+model Archive {
+  id          Int      @id @default(autoincrement())
+  issueNumber String   @unique
+  year        String
+  pdfUrl      String
+  title       String?
+  createdAt   DateTime @default(now())
 }

@@ -1,48 +1,40 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { list } from '@vercel/blob';
 
-const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
+const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
 
-// Generate a clean human-readable label from a filename
+// Helper to generate a label from a cloud filename
 function generateLabel(filename) {
   let base = filename
-    .replace(/^n\d+-/i, '')   // strip edition prefix e.g. "n328-"
-    .replace(/\.\w+$/, '');   // strip extension
+    .replace(/^n\d+-/i, '')
+    .replace(/\.\w+$/, '');
 
-  // If what remains is the generic "sport-sante-{number}" pattern,
-  // replace it with "Photo N°{number}" — the original filenames were uninformative
   const genericMatch = base.match(/^sport[_-]sante[_-](\d+)$/i);
-  if (genericMatch) {
-    return `Photo N°${genericMatch[1]}`;
-  }
+  if (genericMatch) return `Photo N°${genericMatch[1]}`;
 
   return base
-    .replace(/[-_]/g, ' ')                        // separators → spaces
-    .replace(/\bs\b/gi, "s'")                     // lone 's' → "s'" (contraction)
-    .replace(/ (\d+)$/, ' #$1')                   // trailing number → "#N"
-    .replace(/\b(\w)/g, c => c.toUpperCase())     // title-case
+    .replace(/[-_]/g, ' ')
+    .replace(/\bs\b/gi, "s'")
+    .replace(/ (\d+)$/, ' #$1')
+    .replace(/\b(\w)/g, c => c.toUpperCase())
     .trim();
 }
 
 export async function GET() {
-  const photosDir = path.join(process.cwd(), 'public/media/photos');
-
   try {
-    if (!fs.existsSync(photosDir)) {
-      return NextResponse.json([]);
-    }
-
-    const files = fs.readdirSync(photosDir).filter(f => {
-      const ext = path.extname(f).toLowerCase();
-      return IMAGE_EXTS.includes(ext) && !f.startsWith('.');
+    // 1. List all photos stored in the Cloud
+    const { blobs } = await list({
+      prefix: 'media/photos/',
     });
 
-    // Group by edition number parsed from filename prefix "n{number}-*"
-    // Files without a prefix get grouped under "general"
     const groups = {};
 
-    files.forEach(filename => {
+    blobs.forEach(blob => {
+      const filename = blob.pathname.split('/').pop();
+      const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+
+      if (!IMAGE_EXTS.includes(`.${ext.toLowerCase()}`) || filename.startsWith('.')) return;
+
       const match = filename.match(/^n(\d+)-/i);
       const edition = match ? match[1] : 'general';
 
@@ -51,7 +43,7 @@ export async function GET() {
       }
 
       groups[edition].photos.push({
-        src: `/media/photos/${filename}`,
+        src: blob.url,       // The high-speed Cloud URL
         filename,
         label: generateLabel(filename),
       });
@@ -66,7 +58,7 @@ export async function GET() {
 
     return NextResponse.json(sorted);
   } catch (err) {
-    console.error('Error reading photos directory:', err);
+    console.error('Error reading Cloud photos:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

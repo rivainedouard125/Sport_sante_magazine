@@ -1,18 +1,10 @@
 'use server';
 
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-function getUploadDir(subPath) {
-  const dir = path.join(process.cwd(), 'public/media', subPath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  return dir;
-}
-
-// ── ACTION 1: Update Homepage (Cover + Title + Sommaire) ──────────────
+/* ── ACTION 1: Update Homepage (Metadata in Database, Images in Blob) ────── */
 export async function updateHomePage(formData) {
   const issueNumber = formData.get('issueNumber');
   const issueDate   = formData.get('issueDate');
@@ -27,43 +19,57 @@ export async function updateHomePage(formData) {
   }
 
   try {
-    let coverSrc = null;
+    let coverUrl = null;
 
-    // 1. Upload new cover if provided
+    // 1. Upload new cover to Vercel Blob (Cloud)
     if (coverFile && coverFile.size > 0) {
-      const buffer   = Buffer.from(await coverFile.arrayBuffer());
-      const coverDir = path.join(process.cwd(), 'public/media/covers/current');
-      if (!fs.existsSync(coverDir)) fs.mkdirSync(coverDir, { recursive: true });
-      const ext      = coverFile.name.split('.').pop().toLowerCase();
-      const fileName = `cover-${issueNumber}.${ext}`;
-      fs.writeFileSync(path.join(coverDir, fileName), buffer);
-      coverSrc = `/media/covers/current/${fileName}`;
+      const { url } = await put(`media/covers/current/cover-${issueNumber}.jpg`, coverFile, {
+        access: 'public',
+        addRandomSuffix: false,
+      });
+      coverUrl = url;
     }
 
-    // 2. Persist metadata to JSON for homepage to read
-    const meta = {
-      issueNumber,
-      issueDate:   issueDate || '',
-      headline:    headline || '',
-      subheadline: subheadline || '',
-      bodyText:    bodyText || '',
-      coverSrc:    coverSrc || `/media/covers/current/cover-${issueNumber}.jpg`,
-      sommaire:    sommaireRaw ? JSON.parse(sommaireRaw) : [],
-      updatedAt:   new Date().toISOString(),
-    };
+    // 2. Persist metadata to Vercel Postgres (Database) via Prisma
+    // This makes sure your "Sommaire" and Headlines are permanent.
+    await prisma.issue.upsert({
+      where: { issueNumber: issueNumber },
+      update: {
+        issueDate:   issueDate || '',
+        headline:    headline || '',
+        subheadline: subheadline || '',
+        bodyText:    bodyText || '',
+        coverSrc:    coverUrl || undefined, // Only update if we uploaded a new one
+        sommaireJson: sommaireRaw || '[]',
+        isCurrent:    true,
+      },
+      create: {
+        issueNumber: issueNumber,
+        issueDate:   issueDate || '',
+        headline:    headline || '',
+        subheadline: subheadline || '',
+        bodyText:    bodyText || '',
+        coverSrc:    coverUrl || `/media/covers/current/cover-${issueNumber}.jpg`,
+        sommaireJson: sommaireRaw || '[]',
+        isCurrent:    true,
+      },
+    });
 
-    const metaPath = path.join(process.cwd(), 'public/media/covers/current/meta.json');
-    fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2));
+    // Mark other issues as not current
+    await prisma.issue.updateMany({
+      where: { NOT: { issueNumber: issueNumber } },
+      data: { isCurrent: false },
+    });
 
     revalidatePath('/');
-    return { success: true, message: `Page d'accueil mise à jour — N°${issueNumber}` };
+    return { success: true, message: `Page d'accueil mise à jour en Cloud (DB + Blob) — N°${issueNumber}` };
   } catch (err) {
-    console.error(err);
-    return { success: false, error: 'Mise à jour échouée : ' + err.message };
+    console.error('Update Error:', err);
+    return { success: false, error: 'Mise à jour Cloud échouée : ' + err.message };
   }
 }
 
-// ── ACTION 2: Upload Archive PDF + Cover ─────────────────────────────
+/* ── ACTION 2: Upload Archive PDF (Vercel Blob) ─────────────────────────── */
 export async function uploadArchive(formData) {
   const issueNumber = formData.get('issueNumber');
   const year        = formData.get('year') || new Date().getFullYear().toString();
@@ -74,48 +80,57 @@ export async function uploadArchive(formData) {
   }
 
   try {
-    const pdfBuffer = Buffer.from(await pdfFile.arrayBuffer());
-    const pdfDir    = getUploadDir(`archives/${year}`);
-    fs.writeFileSync(path.join(pdfDir, `SportSante_${issueNumber}.pdf`), pdfBuffer);
+    // 1. Upload PDF to Vercel Blob
+    const { url } = await put(`media/archives/${year}/SportSante_${issueNumber}.pdf`, pdfFile, {
+      access: 'public',
+      addRandomSuffix: false,
+    });
+
+    // 2. Track it in our database for easier listing
+    await prisma.archive.upsert({
+      where: { issueNumber: issueNumber },
+      update: { year, pdfUrl: url },
+      create: { issueNumber, year, pdfUrl: url },
+    });
 
     revalidatePath('/archives');
     revalidatePath('/');
-    return { success: true, message: `N°${issueNumber} (${year}) archivé avec succès.` };
+    return { success: true, message: `N°${issueNumber} (${year}) archivé dans le Cloud.` };
   } catch (err) {
-    console.error(err);
-    return { success: false, error: 'Upload échoué : ' + err.message };
+    console.error('Archive Error:', err);
+    return { success: false, error: 'Upload Cloud échoué : ' + err.message };
   }
 }
 
-// ── ACTION 3: Upload Photos to Photothèque ────────────────────────────
+/* ── ACTION 3: Upload Photos (Vercel Blob) ───────────────────────────────── */
 export async function uploadPhotos(formData) {
   const files   = formData.getAll('photos');
-  const edition = formData.get('edition')?.trim(); // optional: e.g. "363"
+  const edition = formData.get('edition')?.trim();
 
   if (!files || files.length === 0 || files[0].size === 0) {
     return { success: false, error: 'Aucune photo sélectionnée.' };
   }
 
   try {
-    const photoDir = getUploadDir('photos');
     let count = 0;
     for (const file of files) {
       if (file.size > 0) {
-        const buffer    = Buffer.from(await file.arrayBuffer());
         const cleanBase = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_').toLowerCase();
-        // Prefix with edition number if provided, and not already prefixed
         const prefix    = edition ? `n${edition}-` : '';
-        const alreadyPrefixed = cleanBase.match(/^n\d+-/);
-        const finalName = (edition && !alreadyPrefixed) ? prefix + cleanBase : cleanBase;
-        fs.writeFileSync(path.join(photoDir, finalName), buffer);
+        const finalPath = `media/photos/${prefix}${cleanBase}`;
+
+        await put(finalPath, file, {
+          access: 'public',
+          addRandomSuffix: false,
+        });
         count++;
       }
     }
     revalidatePath('/photos');
     revalidatePath('/');
-    return { success: true, message: `${count} photo(s) ajoutée(s) à la photothèque.` };
+    return { success: true, message: `${count} photo(s) ajoutée(s) au Cloud Photothèque.` };
   } catch (err) {
-    console.error(err);
-    return { success: false, error: 'Upload des photos échoué : ' + err.message };
+    console.error('Photo Error:', err);
+    return { success: false, error: 'Upload Cloud des photos échoué : ' + err.message };
   }
 }
