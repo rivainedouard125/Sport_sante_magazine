@@ -563,12 +563,35 @@
   }
 
   /* ── HERO ── */
-  .home-hero-section { padding: 3rem 1.25rem; }
+  .home-hero-section { padding: 4rem 1.25rem; text-align: center; }
+  .issue-main-highlight { 
+    flex-direction: column; 
+    gap: 3rem; 
+    text-align: center; 
+    align-items: center; 
+  }
+  .issue-editorial-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
   .cover-img { width: 100%; max-width: 280px; margin: 0 auto; }
-  .main-headline { font-size: 2rem; }
-  .main-body-text { font-size: 1rem; }
-  .main-actions { flex-direction: column; gap: 1.25rem; width: 100%; }
-  .cover-badge { left: 0; top: 0; }
+  .main-headline { 
+    font-size: 2.2rem; 
+    margin-top: 1rem; 
+    width: 100%;
+    word-wrap: break-word;
+  }
+  .main-body-text { font-size: 1rem; margin-left: auto; margin-right: auto; }
+  .main-actions { 
+    flex-direction: column; 
+    gap: 1.25rem; 
+    width: 100%; 
+    align-items: center;
+  }
+  .cover-badge { left: 50%; transform: translateX(-50%) translateY(-50%) rotate(-4deg); top: 0; }
+  .view-sommaire-hint { display: none; } /* Hide on mobile to save space */
 
   /* ── SECTION HEADERS ── */
   .section-header-flex { flex-direction: column; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
