@@ -14,6 +14,32 @@ async function getHomePageData() {
       })
     ]);
 
+    const FALLBACK_SOMMAIRE = [
+      { id: 1, page: '4',  text: 'Kilian et Alexis, fierté du PAN' },
+      { id: 2, page: '5',  text: 'Le Méchant' },
+      { id: 3, page: '6',  text: 'Neels Theric a tutoyé les sommets' },
+      { id: 4, page: '7',  text: 'Georges Bagousse' },
+      { id: 5, page: '8',  text: 'Magali Napolitani, quelle énergie !' },
+      { id: 6, page: '9',  text: 'L'AVCAix Provence Dole à l'attaque' },
+      { id: 7, page: '10', text: 'FC Tholonet : une certaine idée du foot' },
+      { id: 8, page: '12', text: 'Les filles du SCAP passent un cap' },
+      { id: 9, page: '13', text: 'Laziz Afarnos, la fibre associative' },
+      { id: 10, page: '14', text: 'Échos de proximité' },
+      { id: 11, page: '16', text: 'HumanFab : le rêve abouti de "JB"' },
+      { id: 12, page: '17', text: 'L'AUC Padel joue l'ouverture' },
+      { id: 13, page: '19', text: 'Luca Tamburro, la force tranquille' },
+      { id: 14, page: '20', text: 'Le CHA très présent sur les compétitions' },
+      { id: 15, page: '21', text: 'André Apostolo, aux mille passions' },
+      { id: 16, page: '22', text: 'De perf en perf' },
+      { id: 17, page: '24', text: 'Trophée France Sport : Uggo Barruol' },
+    ];
+
+    const FALLBACK_DOSSIERS = [
+      { tag: 'Grand Angle', title: 'Le Sport au service de la Santé Publique : Enjeux et Défis', imageSrc: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80' },
+      { tag: 'Reportage', title: 'Aix s\'élance : Le guide complet des événements sportifs 2024', imageSrc: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80' },
+      { tag: 'Elite', title: 'Grand Prix Cycliste : Dans les coulisses de la préparation', imageSrc: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80' },
+    ];
+
     if (currentIssue) {
       let sommaireItems = [];
       let dossiers = null;
@@ -26,6 +52,16 @@ async function getHomePageData() {
           sommaireItems = parsed;
         }
       } catch (e) {}
+
+      // If sommaire from DB is empty, use fallback
+      if (!sommaireItems || sommaireItems.length === 0) {
+        sommaireItems = FALLBACK_SOMMAIRE;
+      }
+
+      // If dossiers not yet saved via admin, use fallback
+      if (!dossiers || dossiers.length === 0) {
+        dossiers = FALLBACK_DOSSIERS;
+      }
 
       return {
         ...currentIssue,

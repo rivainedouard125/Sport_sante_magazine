@@ -10,6 +10,11 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfa
 export const metadata = {
   title: 'Sport Santé Magazine | Le bimestriel du sport aixois',
   description: 'Retrouvez toute l\'actualité sportive de la région d\'Aix-en-Provence : Water Polo, Taekwondo, Football, et plus encore.',
+  icons: {
+    icon: '/icon.png',
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({ children }) {
