@@ -82,6 +82,26 @@
   color: var(--primary);
 }
 
+.admin-back-btn {
+  padding: 0.6rem 1.4rem;
+  background: transparent;
+  border: 1px solid #333;
+  border-radius: 6px;
+  color: #888;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-back-btn:hover {
+  border-color: #555;
+  color: #fff;
+}
+
 /* ── TAB NAV ─────────────────────────────────────────────────────── */
 .admin-tab-nav {
   display: flex;

@@ -451,6 +451,7 @@ export default function AdminForms({ userName, logoutAction }) {
         </div>
         <div className="admin-user-info">
           {userName && <span className="admin-welcome">Bonjour, {userName}</span>}
+          <a href="/" className="admin-back-btn">← Voir le site</a>
           <form action={logoutAction}>
             <button type="submit" className="admin-logout-btn">Déconnexion</button>
           </form>
