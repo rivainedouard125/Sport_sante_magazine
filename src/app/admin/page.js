@@ -8,7 +8,7 @@ export default async function AdminPage() {
 
   async function logout() {
     'use server';
-    await signOut();
+    await signOut({ redirectTo: '/' });
   }
 
   return (
