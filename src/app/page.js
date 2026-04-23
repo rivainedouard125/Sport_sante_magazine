@@ -53,8 +53,8 @@ async function getHomePageData() {
         }
       } catch (e) {}
 
-      // If sommaire from DB is empty, use fallback
-      if (!sommaireItems || sommaireItems.length === 0) {
+      // If sommaire from DB is incomplete (< 10 items), use the full fallback
+      if (!sommaireItems || sommaireItems.length < 10) {
         sommaireItems = FALLBACK_SOMMAIRE;
       }
 
