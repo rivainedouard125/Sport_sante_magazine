@@ -146,9 +146,15 @@
 
 /* ── CONTENT AREA ────────────────────────────────────────────────── */
 .admin-content {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 3rem 2rem 5rem;
+}
+
+.admin-sections-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
 }
 
 .admin-panel {
@@ -161,6 +167,7 @@
 .admin-panel-header {
   padding-bottom: 1.5rem;
   border-bottom: 1px solid #1e1e1e;
+  margin-bottom: 2rem;
 }
 
 .admin-panel-title {
@@ -177,12 +184,126 @@
   line-height: 1.6;
 }
 
+.admin-loading {
+  padding: 5rem;
+  text-align: center;
+  color: #555;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 /* ── FORM CARD ───────────────────────────────────────────────────── */
 .admin-form-card {
   background: #111;
   border: 1px solid #1e1e1e;
+  border-radius: 12px;
+  padding: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.admin-card-footer {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.admin-save-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-save-btn:hover:not(:disabled) {
+  background: #c5141c;
+  transform: translateY(-1px);
+}
+
+.admin-save-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.admin-current-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: #0a0a0a;
   border-radius: 8px;
-  padding: 2rem;
+  border: 1px solid #1a1a1a;
+}
+
+.admin-label-small {
+  font-size: 0.7rem;
+  color: #444;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.admin-thumb-tiny {
+  width: 40px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #222;
+}
+
+.admin-thumb-micro {
+  width: 32px;
+  height: 32px;
+  object-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+
+.admin-dossier-card-v2 {
+  background: #0d0d0d;
+  border: 1px solid #1a1a1a;
+  border-radius: 8px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-dossier-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.admin-badge-small {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+
+.admin-input-small {
+  padding: 0.6rem 0.8rem;
+  background: #111;
+  color: #ccc;
+  border: 1px solid #222;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  width: 100%;
 }
 
 .admin-form-card-title {

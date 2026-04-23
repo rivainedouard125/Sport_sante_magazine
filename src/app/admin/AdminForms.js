@@ -1,7 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { updateHomePage, uploadArchive, uploadPhotos } from './actions';
+import { 
+  saveIssueIdentity, 
+  saveIssueCover, 
+  saveIssueEditorial, 
+  saveIssueSommaire, 
+  saveIssueDossiers, 
+  uploadArchive, 
+  uploadPhotos 
+} from './actions';
 import './admin.css';
 
 // ── LIVE IMAGE PREVIEW ────────────────────────────────────────────────
@@ -73,16 +81,39 @@ function StatusMsg({ status }) {
   );
 }
 
-// ── TAB 1: PAGE D'ACCUEIL ─────────────────────────────────────────────
+// ── TAB 1: PAGE D'ACCUEIL (REDESIGNED) ─────────────────────────────
 function TabHomePage() {
-  const [status, setStatus] = useState(null);
-  const [sommaire, setSommaire] = useState([{ page: '', text: '' }]);
-  const [dossiers, setDossiers] = useState([
-    { tag: 'Grand Angle', title: '', file: null },
-    { tag: 'Reportage', title: '', file: null },
-    { tag: 'Elite', title: '', file: null }
-  ]);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  
+  // Section-specific status
+  const [status, setStatus] = useState({
+    identity: null,
+    cover: null,
+    editorial: null,
+    sommaire: null,
+    dossiers: null
+  });
+
+  const [sommaire, setSommaire] = useState([]);
+  const [dossiers, setDossiers] = useState([]);
   const [coverFile, setCoverFile] = useState(null);
+
+  // Fetch current live data on mount
+  useEffect(() => {
+    fetch('/api/admin/current-issue')
+      .then(res => res.json())
+      .then(json => {
+        setData(json);
+        setSommaire(json.sommaire || []);
+        setDossiers(json.dossiers || []);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Fetch error:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const addRow = () => setSommaire(s => [...s, { page: '', text: '' }]);
   const removeRow = i => setSommaire(s => s.filter((_, idx) => idx !== i));
@@ -92,147 +123,165 @@ function TabHomePage() {
   const updateDossier = (i, field, val) =>
     setDossiers(d => d.map((dos, idx) => idx === i ? { ...dos, [field]: val } : dos));
 
-  const handleSubmit = async e => {
+  const handleSaveSection = async (section, action, e) => {
     e.preventDefault();
-    setStatus({ pending: true });
+    setStatus(s => ({ ...s, [section]: { pending: true } }));
+    
     const formData = new FormData(e.target);
-    // Normalize to {page, text} which is what Sommaire.js expects
-    formData.set('sommaire', JSON.stringify(sommaire.map(r => ({ page: r.page, text: r.text || r.title || '' }))));
+    formData.set('issueNumber', data.issueNumber);
     
-    // Add dossiers text data to formData
-    formData.set('dossiersData', JSON.stringify(dossiers.map(d => ({ tag: d.tag, title: d.title }))));
-    // The files are naturally included in the form via their name attributes: dossier_img_0, dossier_img_1, etc.
-    
-    const result = await updateHomePage(formData);
-    setStatus(result);
-    if (result?.success) {
-      setSommaire([{ page: '', text: '' }]);
-      setDossiers([
-        { tag: 'Grand Angle', title: '', file: null },
-        { tag: 'Reportage', title: '', file: null },
-        { tag: 'Elite', title: '', file: null }
-      ]);
-      setCoverFile(null);
-      e.target.reset();
+    if (section === 'sommaire') {
+      formData.set('sommaire', JSON.stringify(sommaire));
     }
+    if (section === 'dossiers') {
+      formData.set('dossiersData', JSON.stringify(dossiers.map(d => ({ tag: d.tag, title: d.title }))));
+    }
+
+    const result = await action(formData);
+    setStatus(s => ({ ...s, [section]: result }));
   };
+
+  if (loading) return <div className="admin-loading">Chargement des données en direct...</div>;
+  if (!data) return <div className="admin-error">Erreur: Impossible de charger les données.</div>;
 
   return (
     <div className="admin-panel">
       <div className="admin-panel-header">
-        <h2 className="admin-panel-title">Page d'accueil</h2>
+        <h2 className="admin-panel-title">Éditeur de Page d'Accueil</h2>
         <p className="admin-panel-desc">
-          Mettez à jour le numéro affiché en une : couverture, texte éditorial et sommaire.
+          Les données actuelles du <strong>N°{data.issueNumber}</strong> ont été chargées. Chaque section se sauvegarde indépendamment.
         </p>
       </div>
 
-      <form className="admin-form" onSubmit={handleSubmit}>
-        {/* Identité */}
-        <div className="admin-form-card">
-          <div className="admin-form-card-title">Identité du numéro</div>
-          <div className="admin-form-row">
-            <div className="admin-field">
-              <label className="admin-label">Numéro</label>
-              <input className="admin-input" type="text" name="issueNumber" placeholder="Ex : 364" required />
-            </div>
-            <div className="admin-field">
-              <label className="admin-label">Date de parution</label>
-              <input className="admin-input" type="text" name="issueDate" placeholder="Ex : Juin · Août 2026 · N°364" />
-            </div>
-          </div>
-        </div>
-
-        {/* Couverture + preview */}
-        <div className="admin-form-card">
-          <div className="admin-form-card-title">Image de couverture</div>
-          <FileZone
-            name="cover"
-            accept="image/jpeg,image/png,image/webp"
-            hint="JPG / PNG · Format portrait recommandé"
-            onFilesChange={files => setCoverFile(files[0] || null)}
-          />
-          <ImagePreview file={coverFile} />
-        </div>
-
-        {/* Texte éditorial */}
-        <div className="admin-form-card">
-          <div className="admin-form-card-title">Texte éditorial (Hero)</div>
-          <div className="admin-field">
-            <label className="admin-label">Titre principal</label>
-            <input className="admin-input" type="text" name="headline" placeholder="Ex : Dakar 2026 — Neels Theric…" />
-          </div>
-          <div className="admin-field" style={{ marginTop: '1rem' }}>
-            <label className="admin-label">Sous-titre mis en valeur</label>
-            <input className="admin-input" type="text" name="subheadline" placeholder="Mot(s) mis en rouge dans le titre" />
-          </div>
-          <div className="admin-field" style={{ marginTop: '1rem' }}>
-            <label className="admin-label">Corps de texte</label>
-            <textarea className="admin-textarea" name="bodyText" placeholder="Résumé de l'édition visible sur la page d'accueil…" />
-          </div>
-        </div>
-
-        {/* Sommaire dynamique */}
-        <div className="admin-form-card">
-          <div className="admin-form-card-title">Sommaire</div>
-          <div className="sommaire-editor">
-            {sommaire.map((row, i) => (
-              <div key={i} className="sommaire-row">
-                <input
-                  className="admin-input"
-                  type="text"
-                  placeholder="P."
-                  value={row.page}
-                  onChange={e => updateRow(i, 'page', e.target.value)}
-                />
-                <input
-                  className="admin-input"
-                  type="text"
-                  placeholder="Titre de l'article…"
-                  value={row.text}
-                  onChange={e => updateRow(i, 'text', e.target.value)}
-                />
-                <button type="button" className="sommaire-remove-btn" onClick={() => removeRow(i)}>×</button>
+      <div className="admin-sections-grid">
+        
+        {/* 1. IDENTITY SECTION */}
+        <section className="admin-form-card">
+          <div className="admin-form-card-title">1. Identité du numéro</div>
+          <form onSubmit={e => handleSaveSection('identity', saveIssueIdentity, e)}>
+            <div className="admin-form-row">
+              <div className="admin-field">
+                <label className="admin-label">Numéro</label>
+                <input className="admin-input" type="text" name="issueNumber" defaultValue={data.issueNumber} required />
               </div>
-            ))}
-            <button type="button" className="sommaire-add-btn" onClick={addRow}>+ Ajouter une ligne</button>
-          </div>
-        </div>
+              <div className="admin-field">
+                <label className="admin-label">Date de parution</label>
+                <input className="admin-input" type="text" name="issueDate" defaultValue={data.issueDate} />
+              </div>
+            </div>
+            <div className="admin-card-footer">
+              <StatusMsg status={status.identity} />
+              <button type="submit" className="admin-save-btn" disabled={status.identity?.pending}>
+                {status.identity?.pending ? '⏳...' : 'Sauvegarder Identité'}
+              </button>
+            </div>
+          </form>
+        </section>
 
-        {/* Dossiers du Trimestre */}
-        <div className="admin-form-card">
-          <div className="admin-form-card-title">Dossiers du Trimestre (3 cartes)</div>
-          <div className="admin-dossiers-grid">
-            {dossiers.map((dos, i) => (
-              <div key={i} className="admin-dossier-card" style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '1rem' }}>
-                <h4 style={{ margin: '0 0 1rem 0' }}>Dossier {i + 1}</h4>
-                <div className="admin-field">
-                  <label className="admin-label">Tag (ex: Grand Angle)</label>
-                  <input className="admin-input" type="text" value={dos.tag} onChange={e => updateDossier(i, 'tag', e.target.value)} required />
+        {/* 2. COVER SECTION */}
+        <section className="admin-form-card">
+          <div className="admin-form-card-title">2. Image de couverture</div>
+          <div className="admin-current-preview">
+            <span className="admin-label-small">Actuelle :</span>
+            <img src={data.coverSrc} alt="Current" className="admin-thumb-tiny" />
+          </div>
+          <form onSubmit={e => handleSaveSection('cover', saveIssueCover, e)}>
+            <FileZone
+              name="cover"
+              accept="image/jpeg,image/png,image/webp"
+              hint="Changer l'image"
+              onFilesChange={files => setCoverFile(files[0] || null)}
+            />
+            <ImagePreview file={coverFile} />
+            <div className="admin-card-footer">
+              <StatusMsg status={status.cover} />
+              <button type="submit" className="admin-save-btn" disabled={status.cover?.pending}>
+                {status.cover?.pending ? '⏳...' : 'Sauvegarder Image'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* 3. EDITORIAL SECTION */}
+        <section className="admin-form-card">
+          <div className="admin-form-card-title">3. Texte éditorial (Hero)</div>
+          <form onSubmit={e => handleSaveSection('editorial', saveIssueEditorial, e)}>
+            <div className="admin-field">
+              <label className="admin-label">Titre principal</label>
+              <input className="admin-input" type="text" name="headline" defaultValue={data.headline} />
+            </div>
+            <div className="admin-field" style={{ marginTop: '1rem' }}>
+              <label className="admin-label">Sous-titre (mot en rouge)</label>
+              <input className="admin-input" type="text" name="subheadline" defaultValue={data.subheadline} />
+            </div>
+            <div className="admin-field" style={{ marginTop: '1rem' }}>
+              <label className="admin-label">Corps de texte</label>
+              <textarea className="admin-textarea" name="bodyText" defaultValue={data.bodyText} />
+            </div>
+            <div className="admin-card-footer">
+              <StatusMsg status={status.editorial} />
+              <button type="submit" className="admin-save-btn" disabled={status.editorial?.pending}>
+                {status.editorial?.pending ? '⏳...' : 'Sauvegarder Editorial'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* 4. SOMMAIRE SECTION */}
+        <section className="admin-form-card">
+          <div className="admin-form-card-title">4. Sommaire interactif</div>
+          <form onSubmit={e => handleSaveSection('sommaire', saveIssueSommaire, e)}>
+            <div className="sommaire-editor">
+              {sommaire.map((row, i) => (
+                <div key={i} className="sommaire-row">
+                  <input className="admin-input" type="text" placeholder="P." value={row.page} onChange={e => updateRow(i, 'page', e.target.value)} />
+                  <input className="admin-input" type="text" placeholder="Titre..." value={row.text} onChange={e => updateRow(i, 'text', e.target.value)} />
+                  <button type="button" className="sommaire-remove-btn" onClick={() => removeRow(i)}>×</button>
                 </div>
-                <div className="admin-field" style={{ marginTop: '0.5rem' }}>
-                  <label className="admin-label">Titre de l'article</label>
-                  <input className="admin-input" type="text" value={dos.title} onChange={e => updateDossier(i, 'title', e.target.value)} required />
-                </div>
-                <div className="admin-field" style={{ marginTop: '1rem' }}>
-                  <label className="admin-label">Image illustrative</label>
+              ))}
+              <button type="button" className="sommaire-add-btn" onClick={addRow}>+ Ajouter une ligne</button>
+            </div>
+            <div className="admin-card-footer">
+              <StatusMsg status={status.sommaire} />
+              <button type="submit" className="admin-save-btn" disabled={status.sommaire?.pending}>
+                {status.sommaire?.pending ? '⏳...' : 'Sauvegarder Sommaire'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        {/* 5. DOSSIERS SECTION */}
+        <section className="admin-form-card">
+          <div className="admin-form-card-title">5. Dossiers du Trimestre</div>
+          <form onSubmit={e => handleSaveSection('dossiers', saveIssueDossiers, e)}>
+            <div className="admin-dossiers-grid">
+              {dossiers.map((dos, i) => (
+                <div key={i} className="admin-dossier-card-v2">
+                  <div className="admin-dossier-header">
+                    <span className="admin-badge-small">Dossier {i + 1}</span>
+                    {dos.imageSrc && <img src={dos.imageSrc} alt="Dos" className="admin-thumb-micro" />}
+                  </div>
+                  <input className="admin-input-small" type="text" value={dos.tag} onChange={e => updateDossier(i, 'tag', e.target.value)} placeholder="Tag" required />
+                  <input className="admin-input-small" type="text" value={dos.title} onChange={e => updateDossier(i, 'title', e.target.value)} placeholder="Titre" required />
                   <FileZone
                     name={`dossier_img_${i}`}
                     accept="image/jpeg,image/png,image/webp"
-                    hint="Photo du dossier"
+                    hint="Changer l'image"
                     onFilesChange={files => updateDossier(i, 'file', files[0] || null)}
                   />
-                  <ImagePreview file={dos.file} />
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+            <div className="admin-card-footer">
+              <StatusMsg status={status.dossiers} />
+              <button type="submit" className="admin-save-btn" disabled={status.dossiers?.pending}>
+                {status.dossiers?.pending ? '⏳...' : 'Sauvegarder Dossiers'}
+              </button>
+            </div>
+          </form>
+        </section>
 
-        <StatusMsg status={status} />
-        <button type="submit" className="admin-submit-btn" disabled={status?.pending}>
-          {status?.pending ? '⏳ Publication en cours…' : '✓ Publier la page d\'accueil'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

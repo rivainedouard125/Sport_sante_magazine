@@ -4,114 +4,128 @@ import { put } from '@vercel/blob';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 
-/* ── ACTION 1: Update Homepage (Metadata in Database, Images in Blob) ────── */
-export async function updateHomePage(formData) {
-  const issueNumber = formData.get('issueNumber');
-  const issueDate   = formData.get('issueDate');
-  const headline    = formData.get('headline');
-  const subheadline = formData.get('subheadline');
-  const bodyText    = formData.get('bodyText');
-  const coverFile   = formData.get('cover');
-  const sommaireRaw = formData.get('sommaire');
-
-  if (!issueNumber) {
-    return { success: false, error: "Numéro de l'édition requis." };
+/* ── HELPER: Get current issue state to preserve data ── */
+async function getCurrentIssueState(issueNumber) {
+  const issue = await prisma.issue.findUnique({ where: { issueNumber } });
+  if (!issue) return { sommaire: [], dossiers: [] };
+  try {
+    const parsed = JSON.parse(issue.sommaireJson || '{}');
+    return {
+      sommaire: parsed.items || [],
+      dossiers: parsed.dossiers || []
+    };
+  } catch (e) {
+    return { sommaire: [], dossiers: [] };
   }
+}
+
+/* ── ACTION 1A: Save Issue Identity (Number & Date) ── */
+export async function saveIssueIdentity(formData) {
+  const issueNumber = formData.get('issueNumber');
+  const issueDate = formData.get('issueDate');
+  if (!issueNumber) return { success: false, error: "Numéro requis." };
 
   try {
-    let coverUrl = null;
-
-    // 1. Upload new cover to Vercel Blob (Cloud)
-    if (coverFile && coverFile.size > 0) {
-      const { url } = await put(`media/covers/current/cover-${issueNumber}.jpg`, coverFile, {
-        access: 'public',
-        addRandomSuffix: false,
-      });
-      coverUrl = url;
-    }
-
-    // 2. Process Dossiers
-    const dossiersRaw = formData.get('dossiersData');
-    let dossiersData = [];
-    if (dossiersRaw) {
-      dossiersData = JSON.parse(dossiersRaw);
-      
-      // Fetch existing issue to preserve old images if new ones aren't uploaded
-      const existingIssue = await prisma.issue.findUnique({ where: { issueNumber } });
-      let existingDossiers = [];
-      if (existingIssue && existingIssue.sommaireJson) {
-        try {
-          const parsed = JSON.parse(existingIssue.sommaireJson);
-          if (parsed && parsed.dossiers) existingDossiers = parsed.dossiers;
-        } catch (e) {}
-      }
-
-      for (let i = 0; i < 3; i++) {
-        const file = formData.get(`dossier_img_${i}`);
-        let imageUrl = existingDossiers[i]?.imageSrc || '';
-        
-        if (file && file.size > 0) {
-          const { url } = await put(`media/dossiers/current/dos-${i}-${issueNumber}.jpg`, file, {
-            access: 'public',
-            addRandomSuffix: false,
-          });
-          imageUrl = url;
-        }
-        
-        if (dossiersData[i]) {
-          dossiersData[i].imageSrc = imageUrl;
-        }
-      }
-    }
-
-    // Combine Sommaire and Dossiers into one JSON object
-    let finalSommaireJson = '[]';
-    try {
-      const parsedSommaire = JSON.parse(sommaireRaw || '[]');
-      finalSommaireJson = JSON.stringify({
-        items: parsedSommaire,
-        dossiers: dossiersData
-      });
-    } catch (e) {
-      console.error("Failed to parse sommaireRaw");
-    }
-
-    // 3. Persist metadata to Vercel Postgres (Database) via Prisma
     await prisma.issue.upsert({
-      where: { issueNumber: issueNumber },
-      update: {
-        issueDate:   issueDate || '',
-        headline:    headline || '',
-        subheadline: subheadline || '',
-        bodyText:    bodyText || '',
-        coverSrc:    coverUrl || undefined, // Only update if we uploaded a new one
-        sommaireJson: finalSommaireJson,
-        isCurrent:    true,
-      },
-      create: {
-        issueNumber: issueNumber,
-        issueDate:   issueDate || '',
-        headline:    headline || '',
-        subheadline: subheadline || '',
-        bodyText:    bodyText || '',
-        coverSrc:    coverUrl || `/media/covers/current/cover-${issueNumber}.jpg`,
-        sommaireJson: finalSommaireJson,
-        isCurrent:    true,
-      },
+      where: { issueNumber },
+      update: { issueDate, isCurrent: true },
+      create: { issueNumber, issueDate, isCurrent: true, sommaireJson: '{}', coverSrc: '' }
     });
-
-    // Mark other issues as not current
-    await prisma.issue.updateMany({
-      where: { NOT: { issueNumber: issueNumber } },
-      data: { isCurrent: false },
-    });
-
+    // Ensure this is the only current issue
+    await prisma.issue.updateMany({ where: { NOT: { issueNumber } }, data: { isCurrent: false } });
     revalidatePath('/');
-    return { success: true, message: `Page d'accueil mise à jour en Cloud (DB + Blob) — N°${issueNumber}` };
-  } catch (err) {
-    console.error('Update Error:', err);
-    return { success: false, error: 'Mise à jour Cloud échouée : ' + err.message };
-  }
+    return { success: true, message: "Identité mise à jour." };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+/* ── ACTION 1B: Save Editorial Content ── */
+export async function saveIssueEditorial(formData) {
+  const issueNumber = formData.get('issueNumber');
+  const headline = formData.get('headline');
+  const subheadline = formData.get('subheadline');
+  const bodyText = formData.get('bodyText');
+  if (!issueNumber) return { success: false, error: "Numéro requis." };
+
+  try {
+    await prisma.issue.update({
+      where: { issueNumber },
+      data: { headline, subheadline, bodyText }
+    });
+    revalidatePath('/');
+    return { success: true, message: "Éditorial mis à jour." };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+/* ── ACTION 1C: Save Sommaire ── */
+export async function saveIssueSommaire(formData) {
+  const issueNumber = formData.get('issueNumber');
+  const sommaireRaw = formData.get('sommaire');
+  if (!issueNumber) return { success: false, error: "Numéro requis." };
+
+  try {
+    const { dossiers } = await getCurrentIssueState(issueNumber);
+    const items = JSON.parse(sommaireRaw || '[]');
+    await prisma.issue.update({
+      where: { issueNumber },
+      data: { sommaireJson: JSON.stringify({ items, dossiers }) }
+    });
+    revalidatePath('/');
+    return { success: true, message: "Sommaire mis à jour." };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+/* ── ACTION 1D: Save Dossiers ── */
+export async function saveIssueDossiers(formData) {
+  const issueNumber = formData.get('issueNumber');
+  const dossiersRaw = formData.get('dossiersData');
+  if (!issueNumber) return { success: false, error: "Numéro requis." };
+
+  try {
+    const { sommaire, dossiers: existingDossiers } = await getCurrentIssueState(issueNumber);
+    const dossiersData = JSON.parse(dossiersRaw || '[]');
+    
+    for (let i = 0; i < 3; i++) {
+      const file = formData.get(`dossier_img_${i}`);
+      let imageUrl = existingDossiers[i]?.imageSrc || '';
+      
+      if (file && file.size > 0) {
+        // Keeping Blob for now until the migration step
+        const { url } = await put(`media/dossiers/current/dos-${i}-${issueNumber}.jpg`, file, {
+          access: 'public',
+          addRandomSuffix: false,
+        });
+        imageUrl = url;
+      }
+      if (dossiersData[i]) dossiersData[i].imageSrc = imageUrl;
+    }
+
+    await prisma.issue.update({
+      where: { issueNumber },
+      data: { sommaireJson: JSON.stringify({ items: sommaire, dossiers: dossiersData }) }
+    });
+    revalidatePath('/');
+    return { success: true, message: "Dossiers mis à jour." };
+  } catch (e) { return { success: false, error: e.message }; }
+}
+
+/* ── ACTION 1E: Save Cover ── */
+export async function saveIssueCover(formData) {
+  const issueNumber = formData.get('issueNumber');
+  const coverFile = formData.get('cover');
+  if (!issueNumber || !coverFile || coverFile.size === 0) return { success: false, error: "Image requise." };
+
+  try {
+    const { url } = await put(`media/covers/current/cover-${issueNumber}.jpg`, coverFile, {
+      access: 'public',
+      addRandomSuffix: false,
+    });
+    await prisma.issue.update({
+      where: { issueNumber },
+      data: { coverSrc: url }
+    });
+    revalidatePath('/');
+    return { success: true, message: "Couverture mise à jour." };
+  } catch (e) { return { success: false, error: e.message }; }
 }
 
 /* ── ACTION 2: Upload Archive PDF (Vercel Blob) ─────────────────────────── */
