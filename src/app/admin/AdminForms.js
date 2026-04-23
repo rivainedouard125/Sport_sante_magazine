@@ -96,7 +96,6 @@ function TabHomePage() {
   });
 
   const [sommaire, setSommaire] = useState([]);
-  const [dossiers, setDossiers] = useState([]);
   const [coverFile, setCoverFile] = useState(null);
 
   // Fetch current live data on mount
@@ -106,17 +105,6 @@ function TabHomePage() {
       .then(json => {
         setData(json);
         setSommaire(json.sommaire && json.sommaire.length > 0 ? json.sommaire : [{ page: '', text: '' }]);
-        
-        // Ensure we always have 3 dossiers to edit
-        if (json.dossiers && json.dossiers.length === 3) {
-          setDossiers(json.dossiers);
-        } else {
-          setDossiers([
-            { tag: 'Grand Angle', title: '', imageSrc: '' },
-            { tag: 'Reportage', title: '', imageSrc: '' },
-            { tag: 'Elite', title: '', imageSrc: '' }
-          ]);
-        }
         setLoading(false);
       })
       .catch(err => {
@@ -142,9 +130,6 @@ function TabHomePage() {
     
     if (section === 'sommaire') {
       formData.set('sommaire', JSON.stringify(sommaire));
-    }
-    if (section === 'dossiers') {
-      formData.set('dossiersData', JSON.stringify(dossiers.map(d => ({ tag: d.tag, title: d.title }))));
     }
 
     const result = await action(formData);
@@ -260,36 +245,7 @@ function TabHomePage() {
           </form>
         </section>
 
-        {/* 5. DOSSIERS SECTION */}
-        <section className="admin-form-card">
-          <div className="admin-form-card-title">5. Dossiers du Trimestre</div>
-          <form onSubmit={e => handleSaveSection('dossiers', saveIssueDossiers, e)}>
-            <div className="admin-dossiers-grid">
-              {dossiers.map((dos, i) => (
-                <div key={i} className="admin-dossier-card-v2">
-                  <div className="admin-dossier-header">
-                    <span className="admin-badge-small">Dossier {i + 1}</span>
-                    {dos.imageSrc && <img src={dos.imageSrc} alt="Dos" className="admin-thumb-micro" />}
-                  </div>
-                  <input className="admin-input-small" type="text" value={dos.tag} onChange={e => updateDossier(i, 'tag', e.target.value)} placeholder="Tag" required />
-                  <input className="admin-input-small" type="text" value={dos.title} onChange={e => updateDossier(i, 'title', e.target.value)} placeholder="Titre" required />
-                  <FileZone
-                    name={`dossier_img_${i}`}
-                    accept="image/jpeg,image/png,image/webp"
-                    hint="Changer l'image"
-                    onFilesChange={files => updateDossier(i, 'file', files[0] || null)}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="admin-card-footer">
-              <StatusMsg status={status.dossiers} />
-              <button type="submit" className="admin-save-btn" disabled={status.dossiers?.pending}>
-                {status.dossiers?.pending ? '⏳...' : 'Sauvegarder Dossiers'}
-              </button>
-            </div>
-          </form>
-        </section>
+
 
       </div>
     </div>

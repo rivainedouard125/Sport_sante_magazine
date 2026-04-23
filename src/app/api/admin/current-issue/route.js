@@ -21,14 +21,12 @@ export async function GET() {
 
     // Parse JSON data for frontend consumption
     let sommaire = [];
-    let dossiers = [];
     try {
       const parsed = JSON.parse(currentIssue.sommaireJson || '[]');
       
       // Handle new format { items: [], dossiers: [] }
       if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
         sommaire = parsed.items || [];
-        dossiers = parsed.dossiers || [];
       } 
       // Handle old format [...] (just the sommaire array)
       else if (Array.isArray(parsed)) {
@@ -40,8 +38,7 @@ export async function GET() {
 
     return NextResponse.json({
       ...currentIssue,
-      sommaire,
-      dossiers
+      sommaire
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

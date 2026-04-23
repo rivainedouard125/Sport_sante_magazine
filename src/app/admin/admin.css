@@ -263,38 +263,7 @@
   border: 1px solid #222;
 }
 
-.admin-thumb-micro {
-  width: 32px;
-  height: 32px;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 4px;
-  border: 1px solid #333;
-}
 
-.admin-dossier-card-v2 {
-  background: #0d0d0d;
-  border: 1px solid #1a1a1a;
-  border-radius: 8px;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.admin-dossier-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 0.5rem;
-}
-
-.admin-badge-small {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--primary);
-  text-transform: uppercase;
-}
 
 .admin-input-small {
   padding: 0.6rem 0.8rem;

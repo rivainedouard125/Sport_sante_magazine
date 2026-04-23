@@ -48,25 +48,7 @@ export default function HomeContent({ data }) {
       {/* ── SECTION: ÉDITORIAL (The Voice of the Issue) ─────────── */}
       <Editorial />
 
-      {/* ── SECTION: DOSSIERS (The News Grid) ───────────────── */}
-      <section className="home-features-section">
-        <div className="container">
-          <span className="section-label section-label-left">Les Dossiers du Trimestre</span>
-          <h2 className="section-headline-bold section-headline-left">À la une de Sport-Santé</h2>
-          
-          <div className="features-grid">
-            {data.dossiers && data.dossiers.map((dos, idx) => (
-              <div key={idx} className="feature-card">
-                <div className="feature-img-wrapper">
-                  <Image src={dos.imageSrc || '/media/photos/n329-salon-des-sports-31.jpg'} alt="Dossier" fill style={{ objectFit: 'cover' }} />
-                </div>
-                <span className="editorial-tag">{dos.tag}</span>
-                <h3 className="feature-title">{dos.title}</h3>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* ── SECTION: EXPLORATION DES ARCHIVES ────────────────────── */}
       <section className="home-archives-preview">

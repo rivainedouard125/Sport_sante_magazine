@@ -96,36 +96,6 @@ export async function saveIssueSommaire(formData) {
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-/* ── ACTION 1D: Save Dossiers ── */
-export async function saveIssueDossiers(formData) {
-  const issueNumber = formData.get('issueNumber');
-  const dossiersRaw = formData.get('dossiersData');
-  if (!issueNumber) return { success: false, error: "Numéro requis." };
-
-  try {
-    const { sommaire, dossiers: existingDossiers } = await getCurrentIssueState(issueNumber);
-    const dossiersData = JSON.parse(dossiersRaw || '[]');
-    
-    for (let i = 0; i < 3; i++) {
-      const file = formData.get(`dossier_img_${i}`);
-      let imageUrl = existingDossiers[i]?.imageSrc || '';
-      
-      if (file && file.size > 0) {
-        const url = await uploadToCloudinary(file, 'dossiers', `dos-${i}-${issueNumber}`);
-        imageUrl = url;
-      }
-      if (dossiersData[i]) dossiersData[i].imageSrc = imageUrl;
-    }
-
-    await prisma.issue.update({
-      where: { issueNumber },
-      data: { sommaireJson: JSON.stringify({ items: sommaire, dossiers: dossiersData }) }
-    });
-    revalidatePath('/');
-    return { success: true, message: "Dossiers mis à jour." };
-  } catch (e) { return { success: false, error: e.message }; }
-}
-
 /* ── ACTION 1E: Save Cover ── */
 export async function saveIssueCover(formData) {
   const issueNumber = formData.get('issueNumber');
