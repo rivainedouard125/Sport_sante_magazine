@@ -1,24 +1,25 @@
 import { NextResponse } from 'next/server';
-import { list } from '@vercel/blob';
+import cloudinary from '@/lib/cloudinary';
 
 export async function GET() {
   try {
-    // 1. List all files from Vercel Blob that represent our archives
-    const { blobs } = await list({
-      prefix: 'media/archives/', // Fetch from our cloud folder
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'sport-sante/archives/',
+      max_results: 500,
+      resource_type: 'raw' // PDFs are 'raw' in Cloudinary
     });
 
     const archives = [];
 
-    blobs.forEach(blob => {
-      const filename = blob.pathname.split('/').pop();
-      if (!filename.toLowerCase().endsWith('.pdf')) return;
+    result.resources.forEach(resource => {
+      const filename = resource.public_id.split('/').pop();
+      if (!resource.public_id.toLowerCase().endsWith('.pdf')) return;
 
-      // Extract Year and Issue Number from the cloud path: media/archives/[YEAR]/SportSante_[NUMBER].pdf
-      const pathParts = blob.pathname.split('/');
-      const year = pathParts[2]; // media(0) / archives(1) / [YEAR](2)
+      const pathParts = resource.public_id.split('/');
+      const year = pathParts[2]; // sport-sante(0) / archives(1) / [YEAR](2)
 
-      const idMatch = filename.match(/_(\d+)\.pdf$/i);
+      const idMatch = filename.match(/_(\d+)$/i); // Cloudinary public_id removes the extension usually
       const id = idMatch ? parseInt(idMatch[1], 10) : filename;
       const title = `Sport Santé N°${id}`;
 
@@ -28,17 +29,16 @@ export async function GET() {
         year: year || 'N/A',
         date: `Année ${year}`,
         dossier: 'À découvrir dans ce numéro',
-        src: blob.url,       // Points directly to the cloud URL
-        pdfUrl: blob.url,
+        src: resource.secure_url,
+        pdfUrl: resource.secure_url,
       });
     });
 
     // Sort by ID descending (newest first)
-    archives.sort((a, b) => b.id - a.id);
+    archives.sort((a, b) => (typeof b.id === 'number' && typeof a.id === 'number') ? b.id - a.id : 0);
 
     return NextResponse.json(archives);
   } catch (err) {
-    console.error('Error fetching Cloud archives:', err);
-    return NextResponse.json({ error: 'Failed to fetch cloud archives' }, { status: 500 });
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

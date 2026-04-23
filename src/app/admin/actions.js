@@ -1,8 +1,28 @@
-'use server';
-
-import { put } from '@vercel/blob';
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
+import cloudinary from '@/lib/cloudinary';
+
+/* ── HELPER: Upload to Cloudinary ── */
+async function uploadToCloudinary(file, folder, publicId) {
+  if (!file || file.size === 0) return null;
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { 
+        folder: `sport-sante/${folder}`,
+        public_id: publicId,
+        overwrite: true,
+        resource_type: 'auto'
+      },
+      (error, result) => {
+        if (error) reject(error);
+        else resolve(result.secure_url);
+      }
+    ).end(buffer);
+  });
+}
 
 /* ── HELPER: Get current issue state to preserve data ── */
 async function getCurrentIssueState(issueNumber) {
@@ -89,11 +109,7 @@ export async function saveIssueDossiers(formData) {
       let imageUrl = existingDossiers[i]?.imageSrc || '';
       
       if (file && file.size > 0) {
-        // Keeping Blob for now until the migration step
-        const { url } = await put(`media/dossiers/current/dos-${i}-${issueNumber}.jpg`, file, {
-          access: 'public',
-          addRandomSuffix: false,
-        });
+        const url = await uploadToCloudinary(file, 'dossiers', `dos-${i}-${issueNumber}`);
         imageUrl = url;
       }
       if (dossiersData[i]) dossiersData[i].imageSrc = imageUrl;
@@ -115,10 +131,7 @@ export async function saveIssueCover(formData) {
   if (!issueNumber || !coverFile || coverFile.size === 0) return { success: false, error: "Image requise." };
 
   try {
-    const { url } = await put(`media/covers/current/cover-${issueNumber}.jpg`, coverFile, {
-      access: 'public',
-      addRandomSuffix: false,
-    });
+    const url = await uploadToCloudinary(coverFile, 'covers', `cover-${issueNumber}`);
     await prisma.issue.update({
       where: { issueNumber },
       data: { coverSrc: url }
@@ -128,7 +141,7 @@ export async function saveIssueCover(formData) {
   } catch (e) { return { success: false, error: e.message }; }
 }
 
-/* ── ACTION 2: Upload Archive PDF (Vercel Blob) ─────────────────────────── */
+/* ── ACTION 2: Upload Archive PDF (Cloudinary) ─────────────────────────── */
 export async function uploadArchive(formData) {
   const issueNumber = formData.get('issueNumber');
   const year        = formData.get('year') || new Date().getFullYear().toString();
@@ -139,13 +152,8 @@ export async function uploadArchive(formData) {
   }
 
   try {
-    // 1. Upload PDF to Vercel Blob
-    const { url } = await put(`media/archives/${year}/SportSante_${issueNumber}.pdf`, pdfFile, {
-      access: 'public',
-      addRandomSuffix: false,
-    });
+    const url = await uploadToCloudinary(pdfFile, `archives/${year}`, `SportSante_${issueNumber}`);
 
-    // 2. Track it in our database for easier listing
     await prisma.archive.upsert({
       where: { issueNumber: issueNumber },
       update: { year, pdfUrl: url },
@@ -154,14 +162,13 @@ export async function uploadArchive(formData) {
 
     revalidatePath('/archives');
     revalidatePath('/');
-    return { success: true, message: `N°${issueNumber} (${year}) archivé dans le Cloud.` };
+    return { success: true, message: `N°${issueNumber} (${year}) archivé sur Cloudinary.` };
   } catch (err) {
-    console.error('Archive Error:', err);
-    return { success: false, error: 'Upload Cloud échoué : ' + err.message };
+    return { success: false, error: 'Upload Cloudinary échoué : ' + err.message };
   }
 }
 
-/* ── ACTION 3: Upload Photos (Vercel Blob) ───────────────────────────────── */
+/* ── ACTION 3: Upload Photos (Cloudinary) ───────────────────────────────── */
 export async function uploadPhotos(formData) {
   const files   = formData.getAll('photos');
   const edition = formData.get('edition')?.trim();
@@ -174,22 +181,18 @@ export async function uploadPhotos(formData) {
     let count = 0;
     for (const file of files) {
       if (file.size > 0) {
-        const cleanBase = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_').toLowerCase();
+        const cleanBase = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_').toLowerCase().split('.')[0];
         const prefix    = edition ? `n${edition}-` : '';
-        const finalPath = `media/photos/${prefix}${cleanBase}`;
+        const publicId  = `${prefix}${cleanBase}`;
 
-        await put(finalPath, file, {
-          access: 'public',
-          addRandomSuffix: false,
-        });
+        await uploadToCloudinary(file, 'photos', publicId);
         count++;
       }
     }
     revalidatePath('/photos');
     revalidatePath('/');
-    return { success: true, message: `${count} photo(s) ajoutée(s) au Cloud Photothèque.` };
+    return { success: true, message: `${count} photo(s) ajoutée(s) à Cloudinary.` };
   } catch (err) {
-    console.error('Photo Error:', err);
-    return { success: false, error: 'Upload Cloud des photos échoué : ' + err.message };
+    return { success: false, error: 'Upload Cloudinary échoué : ' + err.message };
   }
 }

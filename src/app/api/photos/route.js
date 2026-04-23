@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { list } from '@vercel/blob';
-
-const IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+import cloudinary from '@/lib/cloudinary';
 
 // Helper to generate a label from a cloud filename
 function generateLabel(filename) {
@@ -22,19 +20,17 @@ function generateLabel(filename) {
 
 export async function GET() {
   try {
-    // 1. List all photos stored in the Cloud
-    const { blobs } = await list({
-      prefix: 'media/photos/',
+    const result = await cloudinary.api.resources({
+      type: 'upload',
+      prefix: 'sport-sante/photos/',
+      max_results: 500
     });
 
     const groups = {};
 
-    blobs.forEach(blob => {
-      const filename = blob.pathname.split('/').pop();
-      const ext = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
-
-      if (!IMAGE_EXTS.includes(`.${ext.toLowerCase()}`) || filename.startsWith('.')) return;
-
+    result.resources.forEach(resource => {
+      const filename = resource.public_id.split('/').pop();
+      
       const match = filename.match(/^n(\d+)-/i);
       const edition = match ? match[1] : 'general';
 
@@ -43,7 +39,7 @@ export async function GET() {
       }
 
       groups[edition].photos.push({
-        src: blob.url,       // The high-speed Cloud URL
+        src: resource.secure_url,
         filename,
         label: generateLabel(filename),
       });
@@ -58,7 +54,6 @@ export async function GET() {
 
     return NextResponse.json(sorted);
   } catch (err) {
-    console.error('Error reading Cloud photos:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
