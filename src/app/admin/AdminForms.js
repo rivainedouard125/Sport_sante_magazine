@@ -76,7 +76,7 @@ function StatusMsg({ status }) {
 // ── TAB 1: PAGE D'ACCUEIL ─────────────────────────────────────────────
 function TabHomePage() {
   const [status, setStatus] = useState(null);
-  const [sommaire, setSommaire] = useState([{ page: '', title: '' }]);
+  const [sommaire, setSommaire] = useState([{ page: '', text: '' }]);
   const [dossiers, setDossiers] = useState([
     { tag: 'Grand Angle', title: '', file: null },
     { tag: 'Reportage', title: '', file: null },
@@ -84,7 +84,7 @@ function TabHomePage() {
   ]);
   const [coverFile, setCoverFile] = useState(null);
 
-  const addRow = () => setSommaire(s => [...s, { page: '', title: '' }]);
+  const addRow = () => setSommaire(s => [...s, { page: '', text: '' }]);
   const removeRow = i => setSommaire(s => s.filter((_, idx) => idx !== i));
   const updateRow = (i, field, val) =>
     setSommaire(s => s.map((row, idx) => idx === i ? { ...row, [field]: val } : row));
@@ -96,7 +96,8 @@ function TabHomePage() {
     e.preventDefault();
     setStatus({ pending: true });
     const formData = new FormData(e.target);
-    formData.set('sommaire', JSON.stringify(sommaire));
+    // Normalize to {page, text} which is what Sommaire.js expects
+    formData.set('sommaire', JSON.stringify(sommaire.map(r => ({ page: r.page, text: r.text || r.title || '' }))));
     
     // Add dossiers text data to formData
     formData.set('dossiersData', JSON.stringify(dossiers.map(d => ({ tag: d.tag, title: d.title }))));
@@ -105,7 +106,7 @@ function TabHomePage() {
     const result = await updateHomePage(formData);
     setStatus(result);
     if (result?.success) {
-      setSommaire([{ page: '', title: '' }]);
+      setSommaire([{ page: '', text: '' }]);
       setDossiers([
         { tag: 'Grand Angle', title: '', file: null },
         { tag: 'Reportage', title: '', file: null },
@@ -187,8 +188,8 @@ function TabHomePage() {
                   className="admin-input"
                   type="text"
                   placeholder="Titre de l'article…"
-                  value={row.title}
-                  onChange={e => updateRow(i, 'title', e.target.value)}
+                  value={row.text}
+                  onChange={e => updateRow(i, 'text', e.target.value)}
                 />
                 <button type="button" className="sommaire-remove-btn" onClick={() => removeRow(i)}>×</button>
               </div>
