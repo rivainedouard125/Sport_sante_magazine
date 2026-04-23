@@ -105,8 +105,18 @@ function TabHomePage() {
       .then(res => res.json())
       .then(json => {
         setData(json);
-        setSommaire(json.sommaire || []);
-        setDossiers(json.dossiers || []);
+        setSommaire(json.sommaire && json.sommaire.length > 0 ? json.sommaire : [{ page: '', text: '' }]);
+        
+        // Ensure we always have 3 dossiers to edit
+        if (json.dossiers && json.dossiers.length === 3) {
+          setDossiers(json.dossiers);
+        } else {
+          setDossiers([
+            { tag: 'Grand Angle', title: '', imageSrc: '' },
+            { tag: 'Reportage', title: '', imageSrc: '' },
+            { tag: 'Elite', title: '', imageSrc: '' }
+          ]);
+        }
         setLoading(false);
       })
       .catch(err => {

@@ -23,9 +23,17 @@ export async function GET() {
     let sommaire = [];
     let dossiers = [];
     try {
-      const parsed = JSON.parse(currentIssue.sommaireJson || '{}');
-      sommaire = parsed.items || [];
-      dossiers = parsed.dossiers || [];
+      const parsed = JSON.parse(currentIssue.sommaireJson || '[]');
+      
+      // Handle new format { items: [], dossiers: [] }
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+        sommaire = parsed.items || [];
+        dossiers = parsed.dossiers || [];
+      } 
+      // Handle old format [...] (just the sommaire array)
+      else if (Array.isArray(parsed)) {
+        sommaire = parsed;
+      }
     } catch (e) {
       console.error("JSON parse error in API");
     }
