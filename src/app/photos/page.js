@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import './photos.css';
 
 export default function PhotosPage() {
@@ -119,8 +120,8 @@ export default function PhotosPage() {
               <div className="issue-grid">
                 {group.photos.map((photo, pIdx) => (
                   <div key={pIdx} className="modern-photo-card" onClick={() => openLightbox(photo)}>
-                    <div className="photo-inner">
-                      <img src={photo.src} alt={photo.label} loading="lazy" />
+                    <div className="photo-inner" style={{ position: 'relative', width: '100%', height: '100%' }}>
+                      <Image src={photo.src} alt={photo.label} fill style={{ objectFit: 'cover' }} loading="lazy" />
                       <div className="photo-hover-pane">
                         <span className="photo-event-label">{photo.label}</span>
                         <div className="photo-cta">Agrandir</div>
@@ -157,8 +158,8 @@ export default function PhotosPage() {
         <div className="lightbox-overlay" onClick={closeLightbox}>
           <div className="lightbox-content" onClick={e => e.stopPropagation()}>
             <button className="lightbox-close" onClick={closeLightbox}>&times;</button>
-            <div className="lightbox-img-box">
-              <img src={selectedImg.src} alt={selectedImg.label} />
+            <div className="lightbox-img-box" style={{ position: 'relative', width: '100%', height: '80vh' }}>
+              <Image src={selectedImg.src} alt={selectedImg.label} fill style={{ objectFit: 'contain' }} />
               <div className="lightbox-caption">
                 <span className="editorial-tag red">Sport-Santé Archive</span>
                 <h3>{selectedImg.label}</h3>

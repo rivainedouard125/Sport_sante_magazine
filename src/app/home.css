@@ -496,6 +496,7 @@
 }
 
 .feature-img-wrapper {
+  position: relative;
   height: 240px;
   width: 100%;
   background: #eee;

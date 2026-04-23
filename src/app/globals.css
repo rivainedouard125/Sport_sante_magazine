@@ -49,8 +49,9 @@ body {
   height: 100%;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.045; /* Extremely subtle film grain */
+  opacity: 0.07; /* Boosted for a stronger, tactile magazine feel */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply; /* Helps the grain physically interact with the colors */
 }
 
 /* ─── EDITORIAL TYPOGRAPHY ───────────────────────────────────────── */
@@ -197,13 +198,53 @@ h1, h2, h3, .heading-editorial {
   pointer-events: none;
   z-index: -1; 
   overflow: hidden;
-  background-color: var(--bg-page);
+}
 
-  /* THE POLKA DOT LAYER (Minimalist Magazine Style) */
-  background-image: radial-gradient(var(--primary) 1.5px, transparent 0);
-  background-size: 50px 50px;
-  background-position: center center;
-  opacity: 0.08; /* Much more subtle now that red blobs are gone */
+/* UNIFYING VIGNETTE OVERLAY */
+.editorial-bg-layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* Fades out the edges of the blobs into the natural beige paper color */
+  background: radial-gradient(circle at center, transparent 30%, rgba(253, 250, 246, 0.7) 100%);
+  z-index: 10;
+}
+
+/* ─── PREMIUM TYPOGRAPHIC WATERMARK ────────────────────────── */
+.watermark-text {
+  position: absolute;
+  font-family: var(--font-playfair), serif;
+  font-weight: 900; /* Bold, but not overpowering */
+  font-size: clamp(10rem, 30vw, 40rem); /* Perfect middle-ground scale */
+  line-height: 0.75;
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  color: transparent; /* Transparent center so it doesn't block the page */
+  -webkit-text-stroke: 1.5px var(--primary); /* Crisp, elegant red outline */
+  opacity: 0.12; /* Subtle red presence, clear but not distracting */
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
+  white-space: nowrap;
+}
+
+/* Float them slowly to give the background a subtle breathing life */
+.watermark-1 {
+  top: 5%;
+  left: -5%;
+  animation: floatText 40s infinite linear alternate;
+}
+
+.watermark-2 {
+  bottom: 10%;
+  right: -5%;
+  text-align: right;
+  animation: floatText 50s infinite linear alternate-reverse;
+}
+
+@keyframes floatText {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-5%); }
 }
 
 /* ─── PAGE HEADER UTILITY ───────────────────────────────────────── */

@@ -30,8 +30,53 @@ export async function updateHomePage(formData) {
       coverUrl = url;
     }
 
-    // 2. Persist metadata to Vercel Postgres (Database) via Prisma
-    // This makes sure your "Sommaire" and Headlines are permanent.
+    // 2. Process Dossiers
+    const dossiersRaw = formData.get('dossiersData');
+    let dossiersData = [];
+    if (dossiersRaw) {
+      dossiersData = JSON.parse(dossiersRaw);
+      
+      // Fetch existing issue to preserve old images if new ones aren't uploaded
+      const existingIssue = await prisma.issue.findUnique({ where: { issueNumber } });
+      let existingDossiers = [];
+      if (existingIssue && existingIssue.sommaireJson) {
+        try {
+          const parsed = JSON.parse(existingIssue.sommaireJson);
+          if (parsed && parsed.dossiers) existingDossiers = parsed.dossiers;
+        } catch (e) {}
+      }
+
+      for (let i = 0; i < 3; i++) {
+        const file = formData.get(`dossier_img_${i}`);
+        let imageUrl = existingDossiers[i]?.imageSrc || '';
+        
+        if (file && file.size > 0) {
+          const { url } = await put(`media/dossiers/current/dos-${i}-${issueNumber}.jpg`, file, {
+            access: 'public',
+            addRandomSuffix: false,
+          });
+          imageUrl = url;
+        }
+        
+        if (dossiersData[i]) {
+          dossiersData[i].imageSrc = imageUrl;
+        }
+      }
+    }
+
+    // Combine Sommaire and Dossiers into one JSON object
+    let finalSommaireJson = '[]';
+    try {
+      const parsedSommaire = JSON.parse(sommaireRaw || '[]');
+      finalSommaireJson = JSON.stringify({
+        items: parsedSommaire,
+        dossiers: dossiersData
+      });
+    } catch (e) {
+      console.error("Failed to parse sommaireRaw");
+    }
+
+    // 3. Persist metadata to Vercel Postgres (Database) via Prisma
     await prisma.issue.upsert({
       where: { issueNumber: issueNumber },
       update: {
@@ -40,7 +85,7 @@ export async function updateHomePage(formData) {
         subheadline: subheadline || '',
         bodyText:    bodyText || '',
         coverSrc:    coverUrl || undefined, // Only update if we uploaded a new one
-        sommaireJson: sommaireRaw || '[]',
+        sommaireJson: finalSommaireJson,
         isCurrent:    true,
       },
       create: {
@@ -50,7 +95,7 @@ export async function updateHomePage(formData) {
         subheadline: subheadline || '',
         bodyText:    bodyText || '',
         coverSrc:    coverUrl || `/media/covers/current/cover-${issueNumber}.jpg`,
-        sommaireJson: sommaireRaw || '[]',
+        sommaireJson: finalSommaireJson,
         isCurrent:    true,
       },
     });

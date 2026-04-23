@@ -15,9 +15,22 @@ async function getHomePageData() {
     ]);
 
     if (currentIssue) {
+      let sommaireItems = [];
+      let dossiers = null;
+      try {
+        const parsed = JSON.parse(currentIssue.sommaireJson || '[]');
+        if (parsed && !Array.isArray(parsed) && parsed.items) {
+          sommaireItems = parsed.items;
+          dossiers = parsed.dossiers;
+        } else {
+          sommaireItems = parsed;
+        }
+      } catch (e) {}
+
       return {
         ...currentIssue,
-        sommaire: JSON.parse(currentIssue.sommaireJson || '[]'),
+        sommaire: sommaireItems,
+        dossiers: dossiers,
         recentArchives: recentArchives,
       };
     }
@@ -52,6 +65,17 @@ async function getHomePageData() {
       { id: 16, page: '22', text: 'De perf en perf' },
       { id: 17, page: '24', text: 'Trophée France Sport : Uggo Barruol' },
     ],
+    dossiers: [
+      { tag: 'Grand Angle', title: 'Le Sport au service de la Santé Publique : Enjeux et Défis', imageSrc: '/media/photos/n329-salon-des-sports-31.jpg' },
+      { tag: 'Reportage', title: 'Aix s\'élance : Le guide complet des événements sportifs 2024', imageSrc: '/media/photos/n329-aix-s-elance1.jpg' },
+      { tag: 'Elite', title: 'Grand Prix Cycliste : Dans les coulisses de la préparation', imageSrc: '/media/photos/n328-sport-sante-16.jpg' }
+    ],
+    recentArchives: [
+      { issueNumber: '362', pdfUrl: '/media/archives/pdf/sport-sante-362.pdf' },
+      { issueNumber: '361', pdfUrl: '/media/archives/pdf/sport-sante-361.pdf' },
+      { issueNumber: '360', pdfUrl: '/media/archives/pdf/sport-sante-360.pdf' },
+      { issueNumber: '359', pdfUrl: '/media/archives/pdf/sport-sante-359.pdf' },
+    ]
   };
 }
 

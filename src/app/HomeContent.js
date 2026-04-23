@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import PdfCoverThumb from '@/components/PdfCoverThumb';
 import Sommaire from '@/components/Sommaire';
 import Editorial from '@/components/Editorial';
@@ -18,7 +19,7 @@ export default function HomeContent({ data }) {
             <div className="cover-presentation-block">
               <div className="cover-wrapper">
                 <span className="editorial-tag red cover-badge">N°{data.issueNumber}</span>
-                <img src={data.coverSrc} alt={`Sport Santé N°${data.issueNumber}`} className="cover-img" />
+                <Image src={data.coverSrc} alt={`Sport Santé N°${data.issueNumber}`} width={600} height={800} className="cover-img" priority />
               </div>
             </div>
 
@@ -54,27 +55,15 @@ export default function HomeContent({ data }) {
           <h2 className="section-headline-bold section-headline-left">À la une de Sport-Santé</h2>
           
           <div className="features-grid">
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/n329-salon-des-sports-31.jpg" alt="Dossier" />
+            {data.dossiers && data.dossiers.map((dos, idx) => (
+              <div key={idx} className="feature-card">
+                <div className="feature-img-wrapper">
+                  <Image src={dos.imageSrc || '/media/photos/n329-salon-des-sports-31.jpg'} alt="Dossier" fill style={{ objectFit: 'cover' }} />
+                </div>
+                <span className="editorial-tag">{dos.tag}</span>
+                <h3 className="feature-title">{dos.title}</h3>
               </div>
-              <span className="editorial-tag">Grand Angle</span>
-              <h3 className="feature-title">Le Sport au service de la Santé Publique : Enjeux et Défis</h3>
-            </div>
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/n329-aix-s-elance1.jpg" alt="Dossier" />
-              </div>
-              <span className="editorial-tag">Reportage</span>
-              <h3 className="feature-title">Aix s'élance : Le guide complet des événements sportifs 2024</h3>
-            </div>
-            <div className="feature-card">
-              <div className="feature-img-wrapper">
-                <img src="/media/photos/n328-sport-sante-16.jpg" alt="Dossier" />
-              </div>
-              <span className="editorial-tag">Elite</span>
-              <h3 className="feature-title">Grand Prix Cycliste : Dans les coulisses de la préparation</h3>
-            </div>
+            ))}
           </div>
         </div>
       </section>

@@ -77,6 +77,11 @@ function StatusMsg({ status }) {
 function TabHomePage() {
   const [status, setStatus] = useState(null);
   const [sommaire, setSommaire] = useState([{ page: '', title: '' }]);
+  const [dossiers, setDossiers] = useState([
+    { tag: 'Grand Angle', title: '', file: null },
+    { tag: 'Reportage', title: '', file: null },
+    { tag: 'Elite', title: '', file: null }
+  ]);
   const [coverFile, setCoverFile] = useState(null);
 
   const addRow = () => setSommaire(s => [...s, { page: '', title: '' }]);
@@ -84,15 +89,28 @@ function TabHomePage() {
   const updateRow = (i, field, val) =>
     setSommaire(s => s.map((row, idx) => idx === i ? { ...row, [field]: val } : row));
 
+  const updateDossier = (i, field, val) =>
+    setDossiers(d => d.map((dos, idx) => idx === i ? { ...dos, [field]: val } : dos));
+
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus({ pending: true });
     const formData = new FormData(e.target);
     formData.set('sommaire', JSON.stringify(sommaire));
+    
+    // Add dossiers text data to formData
+    formData.set('dossiersData', JSON.stringify(dossiers.map(d => ({ tag: d.tag, title: d.title }))));
+    // The files are naturally included in the form via their name attributes: dossier_img_0, dossier_img_1, etc.
+    
     const result = await updateHomePage(formData);
     setStatus(result);
     if (result?.success) {
       setSommaire([{ page: '', title: '' }]);
+      setDossiers([
+        { tag: 'Grand Angle', title: '', file: null },
+        { tag: 'Reportage', title: '', file: null },
+        { tag: 'Elite', title: '', file: null }
+      ]);
       setCoverFile(null);
       e.target.reset();
     }
@@ -176,6 +194,36 @@ function TabHomePage() {
               </div>
             ))}
             <button type="button" className="sommaire-add-btn" onClick={addRow}>+ Ajouter une ligne</button>
+          </div>
+        </div>
+
+        {/* Dossiers du Trimestre */}
+        <div className="admin-form-card">
+          <div className="admin-form-card-title">Dossiers du Trimestre (3 cartes)</div>
+          <div className="admin-dossiers-grid">
+            {dossiers.map((dos, i) => (
+              <div key={i} className="admin-dossier-card" style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '1rem' }}>
+                <h4 style={{ margin: '0 0 1rem 0' }}>Dossier {i + 1}</h4>
+                <div className="admin-field">
+                  <label className="admin-label">Tag (ex: Grand Angle)</label>
+                  <input className="admin-input" type="text" value={dos.tag} onChange={e => updateDossier(i, 'tag', e.target.value)} required />
+                </div>
+                <div className="admin-field" style={{ marginTop: '0.5rem' }}>
+                  <label className="admin-label">Titre de l'article</label>
+                  <input className="admin-input" type="text" value={dos.title} onChange={e => updateDossier(i, 'title', e.target.value)} required />
+                </div>
+                <div className="admin-field" style={{ marginTop: '1rem' }}>
+                  <label className="admin-label">Image illustrative</label>
+                  <FileZone
+                    name={`dossier_img_${i}`}
+                    accept="image/jpeg,image/png,image/webp"
+                    hint="Photo du dossier"
+                    onFilesChange={files => updateDossier(i, 'file', files[0] || null)}
+                  />
+                  <ImagePreview file={dos.file} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
